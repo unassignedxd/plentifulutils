@@ -1,0 +1,16 @@
+[
+{
+  "modid": "plentifulutils",
+  "name": "Plentiful Utilities",
+  "description": "A mod that adds a bunch of random things, from ways to generate power to useful building blocks.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["unassigned"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
