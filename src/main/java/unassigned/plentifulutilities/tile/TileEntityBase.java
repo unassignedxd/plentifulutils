@@ -140,7 +140,7 @@ public class TileEntityBase extends TileEntity implements ITickable { //ITickabl
     }
 
     protected boolean sendUpdateWithInterval(){
-        if(this.ticksAlive%2 == 0)
+        if(this.ticksAlive%2 == 0)  //going to have configurability to stop machines updating too often, in hopes to prevent lag
         {
             this.sendUpdate();
             return true;

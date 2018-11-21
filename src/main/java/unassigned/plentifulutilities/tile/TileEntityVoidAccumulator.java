@@ -22,7 +22,7 @@ public class TileEntityVoidAccumulator extends TileEntityInventoryBase {
     public void update() {
         if(this.inv.getStackInSlot(0) != ItemUtil.getEmpty())
         {
-            System.out.println("hello " + world.isRemote + " item: " + this.inv.getStackInSlot(0).getItem());
+            System.out.println("client? " + world.isRemote + " - item: " + this.inv.getStackInSlot(0).getItem().getUnlocalizedName());
         }
     }
 
