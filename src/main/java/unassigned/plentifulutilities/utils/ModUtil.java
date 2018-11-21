@@ -11,7 +11,7 @@ package unassigned.plentifulutilities.utils;
  */
 public final class ModUtil {
 
-    public static final String MODID = "plentifulutils";
+    public static final String MODID = "plentifulutilities";
     public static final String VERSION = "1.12.2-1.0r1";
     public static final String MOD_NAME = "Plentiful Utilities";
 

@@ -8,8 +8,10 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import unassigned.plentifulutilities.inventory.gui.GuiHandler;
 import unassigned.plentifulutilities.proxies.IProxy;
 import unassigned.plentifulutilities.utils.ModUtil;
+import unassigned.plentifulutilities.utils.registry.ModTileEntity;
 import unassigned.plentifulutilities.utils.registry.RegistryHandler;
 
 /**
@@ -42,6 +44,10 @@ public class PlentifulUtilities {
 
     @EventHandler
     public void init(FMLInitializationEvent event){
+
+        GuiHandler.init();
+        ModTileEntity.init();
+
         proxy.init(event);
     }
 
