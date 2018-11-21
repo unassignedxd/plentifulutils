@@ -1,8 +1,6 @@
 package unassigned.plentifulutilities.tile;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.items.IItemHandler;
 import unassigned.plentifulutilities.utils.ItemUtil;
 
 /**
@@ -20,6 +18,8 @@ public class TileEntityVoidAccumulator extends TileEntityInventoryBase {
 
     @Override
     public void update() {
+        super.update();
+
         if(this.inv.getStackInSlot(0) != ItemUtil.getEmpty())
         {
             System.out.println("client? " + world.isRemote + " - item: " + this.inv.getStackInSlot(0).getItem().getUnlocalizedName());

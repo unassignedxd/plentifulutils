@@ -1,7 +1,9 @@
 package unassigned.plentifulutilities.items;
 
 import net.minecraft.item.Item;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import unassigned.plentifulutilities.items.base.ItemBase;
+import unassigned.plentifulutilities.utils.ModUtil;
 
 /**
  * This code is under the GNU General Public License v3.0
@@ -12,6 +14,7 @@ import unassigned.plentifulutilities.items.base.ItemBase;
  * ---
  * Created on 11/20/2018 for plentifulutils
  */
+@GameRegistry.ObjectHolder(ModUtil.MODID)
 public final class ModItems {
 
     public static Item testItem;
