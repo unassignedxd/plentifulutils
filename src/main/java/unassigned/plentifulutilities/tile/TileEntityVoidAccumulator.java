@@ -1,5 +1,8 @@
 package unassigned.plentifulutilities.tile;
 
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.items.IItemHandler;
 import unassigned.plentifulutilities.utils.ItemUtil;
 
 /**
@@ -17,8 +20,23 @@ public class TileEntityVoidAccumulator extends TileEntityInventoryBase {
 
     @Override
     public void update() {
-        super.update();
-
-        if(this.inv.getStackInSlot(0) != ItemUtil.getEmpty()) System.out.println("hey");
+        if(this.inv.getStackInSlot(0) != ItemUtil.getEmpty())
+        {
+            System.out.println("hello " + world.isRemote + " item: " + this.inv.getStackInSlot(0).getItem());
+        }
     }
+
+    @Override
+    public void readFromNBT(NBTTagCompound compound) {
+        super.readFromNBT(compound);
+    }
+
+    @Override
+    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+        return super.writeToNBT(compound);
+    }
+
+    @Override
+    public boolean shouldSyncInventory() { return true; }
+
 }

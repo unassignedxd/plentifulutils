@@ -84,4 +84,5 @@ public class BlockVoidAccumulator extends BlockTEBase {
     public IBlockState withMirror(IBlockState state, Mirror mirror){
         return this.withRotation(state, mirror.toRotation(state.getValue(BlockHorizontal.FACING)));
     }
+
 }
