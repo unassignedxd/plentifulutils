@@ -54,16 +54,15 @@ public abstract class TileEntityInventoryBase extends TileEntityBase {
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-        super.writeToNBT(compound);
         saveSlotsToNBT(this.inv, compound);
-        this.inv.deserializeNBT(compound);
+        super.writeToNBT(compound);
         return compound;
     }
 
     @Override
     public void readFromNBT(NBTTagCompound compound) {
-        super.readFromNBT(compound);
         loadSlotsFromNBT(this.inv, compound);
+        super.readFromNBT(compound);
     }
 
     @Override
