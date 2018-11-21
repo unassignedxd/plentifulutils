@@ -45,6 +45,7 @@ public class TileEntityBase extends TileEntity implements ITickable { //ITickabl
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+        super.writeToNBT(compound);
         compound.setBoolean("DropInv", this.dropInv);
         compound.setInteger("TicksAlive", this.ticksAlive);
 
@@ -53,6 +54,7 @@ public class TileEntityBase extends TileEntity implements ITickable { //ITickabl
 
     @Override
     public void readFromNBT(NBTTagCompound compound) {
+        super.readFromNBT(compound);
         this.dropInv = compound.getBoolean("DropInv");
         this.ticksAlive = compound.getInteger("TicksAlive");
     }
