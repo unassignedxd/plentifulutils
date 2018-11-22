@@ -63,18 +63,22 @@ public class TileEntityBase extends TileEntity implements ITickable { //ITickabl
     public SPacketUpdateTileEntity getUpdatePacket() {
         NBTTagCompound compound = new NBTTagCompound();
         this.writeToNBT(compound);
+        super.getUpdatePacket();
         return new SPacketUpdateTileEntity(this.getPos(), -1, compound);
     }
 
     @Override
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
         this.readFromNBT(pkt.getNbtCompound());
+        super.onDataPacket(net, pkt);
     }
 
     @Override
     public NBTTagCompound getUpdateTag() {
         NBTTagCompound compound = new NBTTagCompound();
         this.writeToNBT(compound);
+        super.getUpdateTag();
+
         return compound;
     }
 
