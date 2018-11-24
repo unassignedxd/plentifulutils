@@ -6,6 +6,8 @@ import net.minecraftforge.fml.common.Mod.*;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import unassigned.plentifulutilities.inventory.gui.GuiHandler;
@@ -13,6 +15,7 @@ import unassigned.plentifulutilities.proxies.IProxy;
 import unassigned.plentifulutilities.utils.ModUtil;
 import unassigned.plentifulutilities.utils.registry.ModTileEntity;
 import unassigned.plentifulutilities.utils.registry.RegistryHandler;
+import unassigned.plentifulutilities.voidenergy.capability.CapabilityVoidEnergy;
 
 /**
  * This code is under the GNU General Public License v3.0
@@ -34,10 +37,15 @@ public class PlentifulUtilities {
 
     public static final Logger LOG = LogManager.getLogger();
 
+    public static SimpleNetworkWrapper network;
+
     @EventHandler
     public void preInit(FMLPreInitializationEvent event){
 
         MinecraftForge.EVENT_BUS.register(new RegistryHandler());
+        network = NetworkRegistry.INSTANCE.newSimpleChannel(ModUtil.MODID);
+
+        CapabilityVoidEnergy.register();
 
         proxy.preInit(event);
     }

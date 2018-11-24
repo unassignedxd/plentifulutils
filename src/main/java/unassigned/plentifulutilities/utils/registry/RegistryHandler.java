@@ -4,9 +4,13 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.registries.IForgeRegistry;
 import unassigned.plentifulutilities.blocks.ModBlocks;
 import unassigned.plentifulutilities.items.ModItems;
+import unassigned.plentifulutilities.utils.ModUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +23,8 @@ import java.util.List;
  * ---
  * Created on 11/20/2018 for plentifulutils
  */
+
+@Mod.EventBusSubscriber(modid = ModUtil.MODID)
 public class RegistryHandler {
 
     public static final List<Block> BLOCKS_LIST = new ArrayList<>();

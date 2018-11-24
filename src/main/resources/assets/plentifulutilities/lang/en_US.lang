@@ -1,0 +1,4 @@
+item.plentifulutilities.item_static_void.name=Unstable Void Matter
+
+message.plentifulutilities:void_energy.get=Chunk %s contains %d spacial void
+message.plentifulutilities:void_energy.not_found=No void found for chunk %s

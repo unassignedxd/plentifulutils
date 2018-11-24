@@ -1,6 +1,7 @@
 package unassigned.plentifulutilities.utils.registry;
 
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import unassigned.plentifulutilities.PlentifulUtilities;
 import unassigned.plentifulutilities.tile.TileEntityBase;
 import unassigned.plentifulutilities.tile.TileEntityVoidAccumulator;
@@ -24,6 +25,7 @@ public class ModTileEntity {
     private static void registerTE(Class<? extends TileEntityBase> teClass){ //accepts any class that extends TEB
         try {
             ResourceLocation teName = new ResourceLocation(ModUtil.MODID, teClass.newInstance().name); // - I have to create a new instance for this to access
+            GameRegistry.registerTileEntity(teClass, teName);
         } catch(Exception e){
             PlentifulUtilities.LOG.fatal("Attempted to register a tile entity, but failed!", e);
         }

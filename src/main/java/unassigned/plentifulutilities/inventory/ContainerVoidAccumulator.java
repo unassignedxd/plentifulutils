@@ -29,6 +29,7 @@ public class ContainerVoidAccumulator extends Container {
         this.accumulator = (TileEntityVoidAccumulator)tile;
 
         this.addSlotToContainer(new SlotItemHandler(this.accumulator.inv, 0, 87, 43));
+        this.addSlotToContainer(new SlotItemHandler(this.accumulator.inv, 1, 40, 43));
 
         for(int i = 0; i < 3; i++){
             for(int j = 0; j < 9; j++){

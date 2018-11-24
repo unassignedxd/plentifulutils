@@ -59,6 +59,6 @@ public class GuiVoidAccumulator extends GuiContainerCustom {
         this.drawTexturedModalRect(this.guiLeft, this.guiTop+93, 0, 0, 176, 86);
 
         this.mc.getTextureManager().bindTexture(RES_LOC);
-        this.drawTexturedModalRect(this.guiLeft, this.guiTop+93, 0, 0, 176, 93);
+        this.drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, 176, 93);
     }
 }

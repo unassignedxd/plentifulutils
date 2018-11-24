@@ -19,7 +19,20 @@ public final class ModItems {
 
     public static Item testItem;
 
+    public static Item item_staticVoidShard;
+
+    public static Item item_voidMesh;
+    public static Item item_reinforcedVoidMesh;
+
+    public static Item item_voidSensor;
+
     public static void init() {
         testItem = new ItemBase("item_test");
+
+        item_staticVoidShard = new ItemStaticVoidShard("item_static_void");
+        item_voidMesh = new ItemVoidMesh("item_void_mesh_basic", 16, false);
+        item_voidMesh = new ItemVoidMesh("item_void_mesh_reinforced", 16, false); //possibly more variations;
+
+        item_voidSensor = new ItemVoidSensor("item_void_sensor");
     }
 }
