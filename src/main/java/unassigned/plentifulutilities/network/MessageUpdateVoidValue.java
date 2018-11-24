@@ -26,15 +26,22 @@ import javax.annotation.Nullable;
 public class MessageUpdateVoidValue implements IMessage {
 
     private ChunkPos chunkPos;
+
     private int voidEnergy;
 
-    public MessageUpdateVoidValue(){}
+    public MessageUpdateVoidValue() {
+    }
 
-    public MessageUpdateVoidValue(IVoidStorage voidStorage){
+    public MessageUpdateVoidValue(IVoidStorage voidStorage) {
         this.chunkPos = voidStorage.getChunkPos();
         this.voidEnergy = voidStorage.getVoidStored();
     }
 
+    /**
+     * Convert from the supplied buffer into your specific message type
+     *
+     * @param buf The buffer
+     */
     @Override
     public void fromBytes(ByteBuf buf) {
         final int chunkX = buf.readInt();
@@ -43,6 +50,11 @@ public class MessageUpdateVoidValue implements IMessage {
         voidEnergy = buf.readInt();
     }
 
+    /**
+     * Deconstruct your message into the supplied byte buffer
+     *
+     * @param buf The buffer
+     */
     @Override
     public void toBytes(ByteBuf buf) {
         buf.writeInt(chunkPos.x);
@@ -56,13 +68,13 @@ public class MessageUpdateVoidValue implements IMessage {
         @Override
         public IMessage onMessage(MessageUpdateVoidValue message, MessageContext ctx) {
             PlentifulUtilities.proxy.getThreadListener(ctx).addScheduledTask(() -> {
-               final World world = PlentifulUtilities.proxy.getClientWorld();
-               assert world != null;
+                final World world = PlentifulUtilities.proxy.getClientWorld();
+                assert world != null;
 
-               final IVoidStorage voidStorage = CapabilityVoidEnergy.getVoidEnergy(world, message.chunkPos);
-               if(!(voidStorage instanceof VoidStorage)) return;
+                final IVoidStorage vEnergy = CapabilityVoidEnergy.getVoidEnergy(world, message.chunkPos);
+                if (!(vEnergy instanceof VoidEnergy)) return;
 
-                ((VoidEnergy) voidStorage).setVoidEnergy(message.voidEnergy);
+                ((VoidEnergy) vEnergy).setVoidEnergy(message.voidEnergy);
             });
 
             return null;

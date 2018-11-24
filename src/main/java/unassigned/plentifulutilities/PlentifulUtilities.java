@@ -11,6 +11,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import unassigned.plentifulutilities.inventory.gui.GuiHandler;
+import unassigned.plentifulutilities.network.ModMessages;
 import unassigned.plentifulutilities.proxies.IProxy;
 import unassigned.plentifulutilities.utils.ModUtil;
 import unassigned.plentifulutilities.utils.registry.ModTileEntity;
@@ -43,7 +44,9 @@ public class PlentifulUtilities {
     public void preInit(FMLPreInitializationEvent event){
 
         MinecraftForge.EVENT_BUS.register(new RegistryHandler());
+        MinecraftForge.EVENT_BUS.register(new CapabilityVoidEnergy.VoidHandler());
         network = NetworkRegistry.INSTANCE.newSimpleChannel(ModUtil.MODID);
+        ModMessages.registerMessages();
 
         CapabilityVoidEnergy.register();
 

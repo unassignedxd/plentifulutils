@@ -4,7 +4,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -24,29 +23,37 @@ public class CapabilityProviderSimple<HANDLER> implements ICapabilityProvider {
 
     protected final HANDLER instance;
 
-    public CapabilityProviderSimple(final HANDLER instance, final Capability<HANDLER> capability, @Nullable final EnumFacing facing){
+    public CapabilityProviderSimple(final HANDLER instance, final Capability<HANDLER> capability, @Nullable final EnumFacing facing) {
         this.instance = instance;
         this.capability = capability;
         this.facing = facing;
     }
 
     @Override
-    public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
-        return capability == getCapability(capability, facing);
+    public boolean hasCapability(final Capability<?> capability, @Nullable final EnumFacing facing) {
+        return capability == getCapability();
     }
 
-    @Nullable
     @Override
-    public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
-        if(capability == getCapability()){
+    @Nullable
+    public <T> T getCapability(final Capability<T> capability, @Nullable final EnumFacing facing) {
+        if (capability == getCapability()) {
             return getCapability().cast(getInstance());
         }
 
         return null;
     }
 
-    public final Capability<HANDLER> getCapability() { return capability; }
+    public final Capability<HANDLER> getCapability() {
+        return capability;
+    }
+
     @Nullable
-    public EnumFacing getFacing() { return facing; }
-    public HANDLER getInstance() { return instance; }
+    public EnumFacing getFacing() {
+        return facing;
+    }
+
+    public final HANDLER getInstance() {
+        return instance;
+    }
 }

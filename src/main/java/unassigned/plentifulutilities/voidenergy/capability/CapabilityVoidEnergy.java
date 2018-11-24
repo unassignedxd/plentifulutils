@@ -2,7 +2,6 @@ package unassigned.plentifulutilities.voidenergy.capability;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagByte;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.util.EnumFacing;
@@ -51,15 +50,17 @@ public class CapabilityVoidEnergy {
 
     private static final ResourceLocation ID = new ResourceLocation(ModUtil.MODID, "void_energy");
 
-    public static void register(){
+    public static void register() {
         CapabilityManager.INSTANCE.register(IVoidHolder.class, new Capability.IStorage<IVoidHolder>() {
             @Override
-            public NBTBase writeNBT(Capability<IVoidHolder> capability, IVoidHolder instance, EnumFacing side) {
+            public NBTBase writeNBT(final Capability<IVoidHolder> capability, final IVoidHolder instance, final EnumFacing side) {
                 return new NBTTagCompound();
             }
 
             @Override
-            public void readNBT(Capability<IVoidHolder> capability, IVoidHolder instance, EnumFacing side, NBTBase nbt) {}
+            public void readNBT(final Capability<IVoidHolder> capability, final IVoidHolder instance, final EnumFacing side, final NBTBase nbt) {
+
+            }
         }, VoidEnergyHolder::new);
     }
 
@@ -85,68 +86,68 @@ public class CapabilityVoidEnergy {
 
 
     @Mod.EventBusSubscriber(modid = ModUtil.MODID)
-    private static class VoidEventHandler {
+    public static class VoidHandler {
 
         @SubscribeEvent
-        public static void onAttachCapabilities(final AttachCapabilitiesEvent<World> event){
+        public static void attachCapabilities(final AttachCapabilitiesEvent<World> event) {
             final IVoidHolder voidHolder = new VoidEnergyHolder();
             event.addCapability(ID, new CapabilityProviderSimple<>(voidHolder, CHUNK_VOID_ENERGY, DEFAULT_FACING));
         }
 
         @SubscribeEvent
-        public static void onChunkDataLoad(final ChunkDataEvent.Load event){
-            final World world = event.getWorld();
-            final ChunkPos chunkPos = event.getChunk().getPos();
-
-            final IVoidHolder voidHolder = getVoidEnergyHolder(world);
-            if(!(voidHolder instanceof IVoidHolderModifiable)) return;
-
-            final VoidEnergy voidEnergy = new VoidEnergy(DEFAULT_CAPACITY, world, chunkPos);
-
-            final NBTTagCompound chunkData = event.getData();
-            if(chunkData.hasKey(ID.toString(), Constants.NBT.TAG_INT)){
-                final NBTTagInt voidTag = (NBTTagInt) chunkData.getTag(ID.toString());
-                voidEnergy.deserializeNBT(voidTag);
-            }
-
-            ((IVoidHolderModifiable) voidHolder).setVoidEnergy(chunkPos, voidEnergy);
-        }
-
-        @SubscribeEvent
-        public static void onChunkLoad(final ChunkEvent.Load event){
+        public static void chunkDataLoad(final ChunkDataEvent.Load event) {
             final World world = event.getWorld();
             final ChunkPos chunkPos = event.getChunk().getPos();
 
             final IVoidHolder voidHolder = getVoidEnergyHolder(world);
             if (!(voidHolder instanceof IVoidHolderModifiable)) return;
 
-            if(voidHolder.getVoidEnergy(chunkPos) != null) return;
+            final VoidEnergy voidEnergy = new VoidEnergy(DEFAULT_CAPACITY, world, chunkPos);
+
+            final NBTTagCompound chunkData = event.getData();
+            if (chunkData.hasKey(ID.toString(), Constants.NBT.TAG_INT)) {
+                final NBTTagInt energyTag = (NBTTagInt) chunkData.getTag(ID.toString());
+                voidEnergy.deserializeNBT(energyTag);
+            }
+
+            ((IVoidHolderModifiable) voidHolder).setVoidEnergy(chunkPos, voidEnergy);
+        }
+
+        @SubscribeEvent
+        public static void chunkLoad(final ChunkEvent.Load event) {
+            final World world = event.getWorld();
+            final ChunkPos chunkPos = event.getChunk().getPos();
+
+            final IVoidHolder voidHolder = getVoidEnergyHolder(world);
+            if (!(voidHolder instanceof IVoidHolderModifiable)) return;
+
+            if (voidHolder.getVoidEnergy(chunkPos) != null) return;
 
             final IVoidStorage voidStorage = new VoidEnergy(DEFAULT_CAPACITY, world, chunkPos);
             ((IVoidHolderModifiable) voidHolder).setVoidEnergy(chunkPos, voidStorage);
         }
 
         @SubscribeEvent
-        public static void onChunkDataSave(final ChunkDataEvent.Save event){
+        public static void chunkDataSave(final ChunkDataEvent.Save event) {
             final IVoidStorage voidStorage = getVoidEnergy(event.getChunk());
-            if(!(voidStorage instanceof VoidEnergy)) return;
+            if (!(voidStorage instanceof VoidEnergy)) return;
 
             event.getData().setTag(ID.toString(), ((VoidEnergy) voidStorage).serializeNBT());
         }
 
         @SubscribeEvent
-        public static void onChunkUnload(final ChunkEvent.Unload event){
+        public static void chunkUnload(final ChunkEvent.Unload event) {
             final IVoidHolder voidHolder = getVoidEnergyHolder(event.getWorld());
-            if(!(voidHolder instanceof IVoidHolderModifiable)) return;
+            if (!(voidHolder instanceof IVoidHolderModifiable)) return;
 
             ((IVoidHolderModifiable) voidHolder).removeVoidEnergy(event.getChunk().getPos());
         }
 
         @SubscribeEvent
-        public static void onPlayerChunkWatch(final ChunkWatchEvent.Watch event) {
+        public static void chunkWatch(final ChunkWatchEvent.Watch event) {
             final EntityPlayerMP player = event.getPlayer();
-            final IVoidStorage voidStorage = getVoidEnergy(player.getEntityWorld(), event.getChunkInstance().getPos());
-            if(voidStorage == null) return;
+            final IVoidStorage voidStorage = getVoidEnergy(player.getEntityWorld(), event.getChunk());
+            if (voidStorage == null) return;
 
             PlentifulUtilities.network.sendTo(new MessageUpdateVoidValue(voidStorage), player);
         }

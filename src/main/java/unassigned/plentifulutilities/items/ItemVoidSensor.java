@@ -7,6 +7,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -40,6 +41,7 @@ public class ItemVoidSensor extends ItemBase {
 
             if(voidStorage != null){
                 playerIn.sendMessage(new TextComponentTranslation("message." + ModUtil.MODID + ":void_energy.get", chunkPos, voidStorage.getVoidStored()));
+                playerIn.sendMessage(new TextComponentString("The current area has " + voidStorage.getVoidStored() + " / " + voidStorage.getMaxVoidStored() + " SV! [ " + chunkPos.x + ", " + chunkPos.z + "]"));
             }else {
                 playerIn.sendMessage(new TextComponentTranslation("message." + ModUtil.MODID + ":void_energy.not_found", chunkPos));
             }
