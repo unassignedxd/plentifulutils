@@ -79,6 +79,10 @@ public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSeriali
         onVoidChanged();
     }
 
+    /**
+     *  This section of the code was derived from Choonster. This code is not to be published publicly.
+     *
+     * **/
     protected void onVoidChanged() {
         final World world = getWorld();
         final ChunkPos chunkPos = getChunkPos();

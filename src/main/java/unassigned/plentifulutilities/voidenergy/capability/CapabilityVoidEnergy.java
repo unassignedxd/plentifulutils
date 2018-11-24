@@ -31,13 +31,11 @@ import unassigned.plentifulutilities.voidenergy.base.energy.IVoidStorage;
 import javax.annotation.Nullable;
 
 /**
- * This code is under the GNU General Public License v3.0
- * You can see more licensing information at:
- * https://github.com/unassignedxd/plentiful-utilities/blob/master/LICENSE
- * ---
- * Copyright © 2018-2019 unassigned
- * ---
- * Created on 11/23/2018 for plentifulutils
+ * This code is not owned by me! This is a test derived from Choonster's TestMod3. This code, however, has been modified to fit my current needs -
+ * and will be re-written with the knowledge obtained from using Choonster's code as a base.
+ *
+ * - I am aware that all ChunkData classes will be deprecated and removed in 1.13 - but as stated about, this is a test to help with my
+ * understanding of how chunks, capabilities and holder classes work.
  */
 public class CapabilityVoidEnergy {
 

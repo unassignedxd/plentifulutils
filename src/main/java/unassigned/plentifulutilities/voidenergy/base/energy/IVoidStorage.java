@@ -4,13 +4,8 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 
 /**
- * This code is under the GNU General Public License v3.0
- * You can see more licensing information at:
- * https://github.com/unassignedxd/plentiful-utilities/blob/master/LICENSE
- * ---
- * Copyright © 2018-2019 unassigned
- * ---
- * Created on 11/23/2018 for plentifulutils
+ * This code is derived from IEnergyStorage owned by cofh and the forge team! This code has been modified to fit my needs, however, credit
+ * should go towards the individuals stated above.
  */
 public interface IVoidStorage {
 

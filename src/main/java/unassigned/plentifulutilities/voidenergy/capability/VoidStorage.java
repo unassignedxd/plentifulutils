@@ -3,7 +3,7 @@ package unassigned.plentifulutilities.voidenergy.capability;
 import unassigned.plentifulutilities.voidenergy.base.IVoidStorageCustom;
 
 /**
-    Most of this class is not my code! This class is mostly derived from MinecraftForge's EnergyStorage.class
+    Most of this class is not my code! This class is mostly derived from MinecraftForge/cofh's EnergyStorage.class. This code has been modified to fit my needs!
  */
 public class VoidStorage implements IVoidStorageCustom {
 
