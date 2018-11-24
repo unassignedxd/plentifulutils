@@ -18,7 +18,8 @@ import java.util.HashMap;
  * Created on 11/23/2018 for plentifulutils
  */
 public class VoidEnergyHolder implements IVoidHolderModifiable {
-    private final Map<ChunkPos, IVoidStorage> voidEnergies = new HashMap<>();
+
+    private static final Map<ChunkPos, IVoidStorage> voidEnergies = new HashMap<>();
 
     @Nullable
     @Override
@@ -35,4 +36,6 @@ public class VoidEnergyHolder implements IVoidHolderModifiable {
     public void removeVoidEnergy(final ChunkPos chunkPos){
         voidEnergies.remove(chunkPos);
     }
+
+    public static Map<ChunkPos, IVoidStorage> getVoidEnergies() { return voidEnergies; }
 }
