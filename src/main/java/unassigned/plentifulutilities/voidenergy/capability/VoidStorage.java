@@ -11,27 +11,29 @@ public class VoidStorage implements IVoidStorageCustom {
     protected int capacity;
     protected int maxReceive;
     protected int maxExtract;
+    protected int ticks;
 
     public VoidStorage(int capacity)
     {
-        this(capacity, capacity, capacity, 0);
+        this(capacity, capacity, capacity, 0, 0);
     }
 
     public VoidStorage(int capacity, int maxTransfer)
     {
-        this(capacity, maxTransfer, maxTransfer, 0);
+        this(capacity, maxTransfer, maxTransfer, 0, 0);
     }
 
     public VoidStorage(int capacity, int maxReceive, int maxExtract)
     {
-        this(capacity, maxReceive, maxExtract, 0);
+        this(capacity, maxReceive, maxExtract, 0, 0);
     }
 
-    public VoidStorage(int capacity, int maxReceive, int maxExtract, int energy)
+    public VoidStorage(int capacity, int maxReceive, int maxExtract, int energy, int ticks)
     {
         this.capacity = capacity;
         this.maxReceive = maxReceive;
         this.maxExtract = maxExtract;
+        this.ticks = ticks;
         this.energy = Math.max(0 , Math.min(capacity, energy));
     }
 
@@ -63,5 +65,15 @@ public class VoidStorage implements IVoidStorageCustom {
     public int getMaxVoidStored()
     {
         return capacity;
+    }
+
+    @Override
+    public int getTicksElapsed() {
+        return ticks;
+    }
+
+    @Override
+    public void setTicksElapsed(int ticks) {
+        this.ticks = ticks;
     }
 }

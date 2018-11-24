@@ -1,5 +1,6 @@
 package unassigned.plentifulutilities.voidenergy.capability;
 
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.server.management.PlayerChunkMapEntry;
 import net.minecraft.util.math.BlockPos;
@@ -22,7 +23,7 @@ import unassigned.plentifulutilities.voidenergy.base.energy.IVoidStorage;
  * ---
  * Created on 11/23/2018 for plentifulutils
  */
-public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSerializable<NBTTagInt> {
+public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSerializable<NBTTagCompound> {
 
     private final World world;
 
@@ -37,13 +38,18 @@ public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSeriali
     }
 
     @Override
-    public NBTTagInt serializeNBT() {
-        return new NBTTagInt(getVoidStored());
+    public NBTTagCompound serializeNBT() {
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setInteger("VoidStored", getVoidStored());
+        tag.setInteger("TicksElapsed", getTicksElapsed());
+
+        return tag;
     }
 
     @Override
-    public void deserializeNBT(NBTTagInt nbt) {
-        energy = nbt.getInt();
+    public void deserializeNBT(NBTTagCompound nbt) {
+        energy = nbt.getInteger("VoidStored");
+        ticks = nbt.getInteger("TicksElapsed");
     }
 
     @Override
@@ -76,6 +82,12 @@ public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSeriali
 
     public void setVoidEnergy(final int energy){
         this.energy = energy;
+        onVoidChanged();
+    }
+
+    @Override
+    public void setTicksElapsed(final int ticks){
+        this.ticks = ticks;
         onVoidChanged();
     }
 

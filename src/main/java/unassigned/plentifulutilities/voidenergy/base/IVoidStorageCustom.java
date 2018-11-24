@@ -18,4 +18,8 @@ public interface IVoidStorageCustom {
     int getVoidStored();
 
     int getMaxVoidStored();
+
+    int getTicksElapsed();
+
+    void setTicksElapsed(int ticks);
 }

@@ -9,6 +9,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -42,8 +43,8 @@ import java.util.Map;
  */
 public class CapabilityVoidEnergy {
 
-    @CapabilityInject(IVoidHolder.class)
-    public static final Capability<IVoidHolder> CHUNK_VOID_ENERGY = null;
+   // @CapabilityInject(IVoidHolder.class)
+   // public static final Capability<IVoidHolder> CHUNK_VOID_ENERGY = null;
 
     @CapabilityInject(IVoidStorage.class)
     public static final Capability<IVoidStorage> CHUNK_VOID_STORAGE = null;
@@ -55,6 +56,7 @@ public class CapabilityVoidEnergy {
     private static final ResourceLocation ID = new ResourceLocation(ModUtil.MODID, "void_energy");
 
     public static void register() {
+        /*
         //todo remove
         CapabilityManager.INSTANCE.register(IVoidHolder.class, new Capability.IStorage<IVoidHolder>() {
             @Override
@@ -67,11 +69,15 @@ public class CapabilityVoidEnergy {
 
             }
         }, VoidEnergyHolder::new);
+        */
         //new chunk based capability
         CapabilityManager.INSTANCE.register(IVoidStorage.class, new Capability.IStorage<IVoidStorage>() {
             @Override
             public NBTBase writeNBT(final Capability<IVoidStorage> capability, final IVoidStorage instance, final EnumFacing side) {
-                return new NBTTagInt(instance.getVoidStored());
+                NBTTagCompound tag = new NBTTagCompound();
+                tag.setInteger("voidStored", instance.getVoidStored());
+                tag.setInteger("ticksElapsed", instance.getTicksElapsed());
+                return tag;
             }
 
             @Override
@@ -79,17 +85,18 @@ public class CapabilityVoidEnergy {
                 if (!(instance instanceof VoidEnergy))
                     throw new IllegalArgumentException("Given incorrect instance from implementation");
 
-                ((VoidEnergy) instance).setVoidEnergy(((NBTTagInt) nbt).getInt());
+                ((VoidEnergy) instance).setVoidEnergy(((NBTTagCompound)nbt).getInteger("voidStored"));
+                ((VoidEnergy) instance).setTicksElapsed(((NBTTagCompound)nbt).getInteger("ticksElapsed"));
             }
         }, () -> null);
     }
-
+    /*
     @Deprecated
     @Nullable
     public static IVoidHolder getVoidEnergyHolder(final World world){
         return getCapability(world, CHUNK_VOID_ENERGY, DEFAULT_FACING);
     }
-
+    */
     @Nullable
     public static IVoidStorage getVoidEnergy(final Chunk chunk) {
         return getCapability(chunk, CHUNK_VOID_STORAGE, DEFAULT_FACING);
@@ -104,14 +111,14 @@ public class CapabilityVoidEnergy {
     public static class VoidHandler {
 
         //todo: remove deprecations
-
+        /*
         @Deprecated
         @SubscribeEvent
         public static void attachCapabilities(final AttachCapabilitiesEvent<World> event) {
             final IVoidHolder voidHolder = new VoidEnergyHolder();
             event.addCapability(ID, new CapabilityProviderSimple<>(voidHolder, CHUNK_VOID_ENERGY, DEFAULT_FACING));
         }
-
+        */
         @SubscribeEvent
         public static void attachChunkCapabiliies(final AttachCapabilitiesEvent<Chunk> event){
             final Chunk chunk = event.getObject();
@@ -119,14 +126,12 @@ public class CapabilityVoidEnergy {
             event.addCapability(ID, new CapabilityProviderSerializable<>(CHUNK_VOID_STORAGE, DEFAULT_FACING, voidStorage));
         }
 
+        /*
         @Deprecated
         @SubscribeEvent
         public static void chunkDataLoad(final ChunkDataEvent.Load event) {
             final World world = event.getWorld();
             final ChunkPos chunkPos = event.getChunk().getPos();
-
-            final IVoidHolder voidHolder = getVoidEnergyHolder(world);
-            if (!(voidHolder instanceof IVoidHolderModifiable)) return;
 
             final VoidEnergy voidEnergy = new VoidEnergy(DEFAULT_CAPACITY, world, chunkPos);
 
@@ -138,22 +143,20 @@ public class CapabilityVoidEnergy {
 
             ((IVoidHolderModifiable) voidHolder).setVoidEnergy(chunkPos, voidEnergy);
         }
-
+        */
+        /*
         @Deprecated
         @SubscribeEvent
         public static void chunkLoad(final ChunkEvent.Load event) {
             final World world = event.getWorld();
             final ChunkPos chunkPos = event.getChunk().getPos();
 
-            final IVoidHolder voidHolder = getVoidEnergyHolder(world);
-            if (!(voidHolder instanceof IVoidHolderModifiable)) return;
+            final IVoidStorage voidStorage = getVoidEnergy(world.getChunkFromChunkCoords(chunkPos.x, chunkPos.z));
+            if(voidStorage != null) return;
 
-            if (voidHolder.getVoidEnergy(chunkPos) != null) return;
-
-            final IVoidStorage voidStorage = new VoidEnergy(DEFAULT_CAPACITY, world, chunkPos);
-            ((IVoidHolderModifiable) voidHolder).setVoidEnergy(chunkPos, voidStorage);
         }
-
+        */
+        /*
         @Deprecated
         @SubscribeEvent
         public static void chunkDataSave(final ChunkDataEvent.Save event) {
@@ -162,7 +165,8 @@ public class CapabilityVoidEnergy {
 
             event.getData().setTag(ID.toString(), ((VoidEnergy) voidStorage).serializeNBT());
         }
-
+        */
+        /*
         @Deprecated
         @SubscribeEvent
         public static void chunkUnload(final ChunkEvent.Unload event) {
@@ -171,7 +175,7 @@ public class CapabilityVoidEnergy {
 
             ((IVoidHolderModifiable) voidHolder).removeVoidEnergy(event.getChunk().getPos());
         }
-
+        */
         @SubscribeEvent
         public static void chunkWatch(final ChunkWatchEvent.Watch event) {
             final EntityPlayerMP player = event.getPlayer();
@@ -190,13 +194,28 @@ public class CapabilityVoidEnergy {
 
             if(!world.isRemote)
             {
-                //if(world.) slow down ticking rates
-                for(IVoidStorage storage : VoidEnergyHolder.getVoidEnergies().values())
+                System.out.println("outside for");
+                for(Map.Entry<ChunkPos, ForgeChunkManager.Ticket> entry : world.getPersistentChunks().entries())
                 {
-                    if(storage.getVoidStored() < DEFAULT_CAPACITY)
+                    System.out.println("within for");
+
+                    Chunk chunkToCheck = world.getChunkFromChunkCoords(entry.getKey().x, entry.getKey().z);
+                    final IVoidStorage voidStorage = CapabilityVoidEnergy.getVoidEnergy(chunkToCheck);
+                    System.out.println(voidStorage);
+                    if(voidStorage != null)
                     {
-                        storage.receiveVoid(world.rand.nextInt(3), false);
+                        voidStorage.setTicksElapsed(voidStorage.getTicksElapsed()+1); //test and mess code
+                        if(voidStorage.getTicksElapsed() % 520 == 0)
+                        {
+                            System.out.println("tick!");
+                            voidStorage.receiveVoid(world.rand.nextInt(10), false);
+                        }
+                        if(voidStorage.getVoidStored() < DEFAULT_CAPACITY)
+                        {
+
+                        }
                     }
+                    else { System.out.println("debug: skipped chunk as it had no void storage!"); /*todo remove debug*/ }
                 }
             }
         }

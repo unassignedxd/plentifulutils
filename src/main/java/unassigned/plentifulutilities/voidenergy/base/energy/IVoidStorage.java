@@ -17,6 +17,10 @@ public interface IVoidStorage {
 
     int getMaxVoidStored();
 
+    int getTicksElapsed();
+
+    void setTicksElapsed(int ticks);
+
     World getWorld();
 
     ChunkPos getChunkPos();

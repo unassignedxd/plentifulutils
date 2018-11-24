@@ -28,6 +28,7 @@ public class MessageUpdateVoidValue implements IMessage {
     private ChunkPos chunkPos;
 
     private int voidEnergy;
+    private int ticks;
 
     public MessageUpdateVoidValue() {
     }
@@ -35,6 +36,7 @@ public class MessageUpdateVoidValue implements IMessage {
     public MessageUpdateVoidValue(IVoidStorage voidStorage) {
         this.chunkPos = voidStorage.getChunkPos();
         this.voidEnergy = voidStorage.getVoidStored();
+        this.ticks = voidStorage.getTicksElapsed();
     }
 
     /**
@@ -48,6 +50,7 @@ public class MessageUpdateVoidValue implements IMessage {
         final int chunkZ = buf.readInt();
         chunkPos = new ChunkPos(chunkX, chunkZ);
         voidEnergy = buf.readInt();
+        ticks = buf.readInt();
     }
 
     /**
@@ -60,6 +63,7 @@ public class MessageUpdateVoidValue implements IMessage {
         buf.writeInt(chunkPos.x);
         buf.writeInt(chunkPos.z);
         buf.writeInt(voidEnergy);
+        buf.writeInt(ticks);
     }
 
     public static class Handler implements IMessageHandler<MessageUpdateVoidValue, IMessage> {
@@ -71,10 +75,11 @@ public class MessageUpdateVoidValue implements IMessage {
                 final World world = PlentifulUtilities.proxy.getClientWorld();
                 assert world != null;
 
-                final IVoidStorage vEnergy = CapabilityVoidEnergy.getVoidEnergy(world, message.chunkPos);
+                final IVoidStorage vEnergy = CapabilityVoidEnergy.getVoidEnergy(world.getChunkFromChunkCoords(message.chunkPos.x, message.chunkPos.z));
                 if (!(vEnergy instanceof VoidEnergy)) return;
 
                 ((VoidEnergy) vEnergy).setVoidEnergy(message.voidEnergy);
+                ((VoidEnergy) vEnergy).setTicksElapsed(message.ticks);
             });
 
             return null;
