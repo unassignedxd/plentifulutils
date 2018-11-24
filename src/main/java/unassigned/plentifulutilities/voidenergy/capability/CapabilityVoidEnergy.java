@@ -184,6 +184,7 @@ public class CapabilityVoidEnergy {
             PlentifulUtilities.network.sendTo(new MessageUpdateVoidValue(voidStorage), player);
         }
 
+        @SubscribeEvent
         public static void onWorldTick(final TickEvent.WorldTickEvent event){
             World world = event.world;
 
