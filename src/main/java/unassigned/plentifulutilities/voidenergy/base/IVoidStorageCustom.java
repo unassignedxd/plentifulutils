@@ -19,7 +19,5 @@ public interface IVoidStorageCustom {
 
     int getMaxVoidStored();
 
-    int getTicksElapsed();
-
-    void setTicksElapsed(int ticks);
+    int getDangerThreshold();
 }

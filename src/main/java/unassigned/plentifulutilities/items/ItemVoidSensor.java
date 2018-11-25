@@ -40,7 +40,7 @@ public class ItemVoidSensor extends ItemBase {
             final IVoidStorage voidStorage = CapabilityVoidEnergy.getVoidEnergy(chunk);
 
             if(voidStorage != null){
-                playerIn.sendMessage(new TextComponentTranslation("message." + ModUtil.MODID + ":void_energy.get", chunkPos, voidStorage.getVoidStored()));
+                //playerIn.sendMessage(new TextComponentTranslation("message." + ModUtil.MODID + ":void_energy.get", chunkPos, voidStorage.getVoidStored()));
                 playerIn.sendMessage(new TextComponentString("The current area has " + voidStorage.getVoidStored() + " / " + voidStorage.getMaxVoidStored() + " SV! [ " + chunkPos.x + ", " + chunkPos.z + "]"));
             }else {
                 playerIn.sendMessage(new TextComponentTranslation("message." + ModUtil.MODID + ":void_energy.not_found", chunkPos));

@@ -29,6 +29,7 @@ public class MessageUpdateVoidValue implements IMessage {
 
     private int voidEnergy;
     private int ticks;
+    private int capacity;
 
     public MessageUpdateVoidValue() {
     }
@@ -37,6 +38,7 @@ public class MessageUpdateVoidValue implements IMessage {
         this.chunkPos = voidStorage.getChunkPos();
         this.voidEnergy = voidStorage.getVoidStored();
         this.ticks = voidStorage.getTicksElapsed();
+        this.capacity = voidStorage.getMaxVoidStored();
     }
 
     /**
@@ -51,6 +53,7 @@ public class MessageUpdateVoidValue implements IMessage {
         chunkPos = new ChunkPos(chunkX, chunkZ);
         voidEnergy = buf.readInt();
         ticks = buf.readInt();
+        capacity = buf.readInt();
     }
 
     /**
@@ -64,6 +67,7 @@ public class MessageUpdateVoidValue implements IMessage {
         buf.writeInt(chunkPos.z);
         buf.writeInt(voidEnergy);
         buf.writeInt(ticks);
+        buf.writeInt(capacity);
     }
 
     public static class Handler implements IMessageHandler<MessageUpdateVoidValue, IMessage> {
@@ -78,8 +82,11 @@ public class MessageUpdateVoidValue implements IMessage {
                 final IVoidStorage vEnergy = CapabilityVoidEnergy.getVoidEnergy(world.getChunkFromChunkCoords(message.chunkPos.x, message.chunkPos.z));
                 if (!(vEnergy instanceof VoidEnergy)) return;
 
+
+                System.out.println("Pack received and updating! SV: " + message.voidEnergy + "/" + message.capacity + " | ticks Sent: " + message.ticks);
                 ((VoidEnergy) vEnergy).setVoidEnergy(message.voidEnergy);
                 ((VoidEnergy) vEnergy).setTicksElapsed(message.ticks);
+                ((VoidEnergy) vEnergy).setMaxVoidEnergy(message.capacity);
             });
 
             return null;

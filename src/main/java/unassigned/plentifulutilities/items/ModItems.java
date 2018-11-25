@@ -25,6 +25,7 @@ public final class ModItems {
     public static Item item_reinforcedVoidMesh;
 
     public static Item item_voidSensor;
+    public static Item item_voidTester;
 
     public static void init() {
         testItem = new ItemBase("item_test");
@@ -34,5 +35,6 @@ public final class ModItems {
         item_voidMesh = new ItemVoidMesh("item_void_mesh_reinforced", 16, false); //possibly more variations;
 
         item_voidSensor = new ItemVoidSensor("item_void_sensor");
+        item_voidTester = new ItemVoidTester("item_void_tester");
     }
 }

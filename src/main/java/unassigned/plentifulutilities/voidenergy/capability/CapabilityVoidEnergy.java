@@ -14,9 +14,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.world.ChunkDataEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -25,14 +23,15 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import unassigned.plentifulutilities.PlentifulUtilities;
 import unassigned.plentifulutilities.network.MessageUpdateVoidValue;
 import unassigned.plentifulutilities.utils.CapabilityProviderSerializable;
-import unassigned.plentifulutilities.utils.CapabilityProviderSimple;
 import unassigned.plentifulutilities.utils.ModUtil;
 import unassigned.plentifulutilities.voidenergy.base.energy.IVoidHolder;
-import unassigned.plentifulutilities.voidenergy.base.energy.IVoidHolderModifiable;
 import unassigned.plentifulutilities.voidenergy.base.energy.IVoidStorage;
 
 import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This code is not owned by me! This is a test derived from Choonster's TestMod3. This code, however, has been modified to fit my current needs -
@@ -51,7 +50,10 @@ public class CapabilityVoidEnergy {
 
     public static final EnumFacing DEFAULT_FACING = null;
 
-    public static final int DEFAULT_CAPACITY = 1000;
+    public static final int DEFAULT_ENERGY = 1000;
+    public static final int BASE_CAPACITY = 6000;
+
+    public static final Map<ChunkPos, IVoidStorage> VOID_CHUNKS_LOADED = new ConcurrentHashMap<>();
 
     private static final ResourceLocation ID = new ResourceLocation(ModUtil.MODID, "void_energy");
 
@@ -77,6 +79,7 @@ public class CapabilityVoidEnergy {
                 NBTTagCompound tag = new NBTTagCompound();
                 tag.setInteger("voidStored", instance.getVoidStored());
                 tag.setInteger("ticksElapsed", instance.getTicksElapsed());
+                tag.setInteger("maxVoidStored", instance.getMaxVoidStored());
                 return tag;
             }
 
@@ -87,6 +90,7 @@ public class CapabilityVoidEnergy {
 
                 ((VoidEnergy) instance).setVoidEnergy(((NBTTagCompound)nbt).getInteger("voidStored"));
                 ((VoidEnergy) instance).setTicksElapsed(((NBTTagCompound)nbt).getInteger("ticksElapsed"));
+                ((VoidEnergy) instance).setMaxVoidEnergy(((NBTTagCompound)nbt).getInteger("maxVoidStored"));
             }
         }, () -> null);
     }
@@ -122,7 +126,7 @@ public class CapabilityVoidEnergy {
         @SubscribeEvent
         public static void attachChunkCapabiliies(final AttachCapabilitiesEvent<Chunk> event){
             final Chunk chunk = event.getObject();
-            final IVoidStorage voidStorage = new VoidEnergy(DEFAULT_CAPACITY, chunk.getWorld(), chunk.getPos());
+            final IVoidStorage voidStorage = new VoidEnergy(BASE_CAPACITY, DEFAULT_ENERGY, chunk.getWorld(), chunk.getPos());
             event.addCapability(ID, new CapabilityProviderSerializable<>(CHUNK_VOID_STORAGE, DEFAULT_FACING, voidStorage));
         }
 
@@ -144,18 +148,7 @@ public class CapabilityVoidEnergy {
             ((IVoidHolderModifiable) voidHolder).setVoidEnergy(chunkPos, voidEnergy);
         }
         */
-        /*
-        @Deprecated
-        @SubscribeEvent
-        public static void chunkLoad(final ChunkEvent.Load event) {
-            final World world = event.getWorld();
-            final ChunkPos chunkPos = event.getChunk().getPos();
 
-            final IVoidStorage voidStorage = getVoidEnergy(world.getChunkFromChunkCoords(chunkPos.x, chunkPos.z));
-            if(voidStorage != null) return;
-
-        }
-        */
         /*
         @Deprecated
         @SubscribeEvent
@@ -166,26 +159,28 @@ public class CapabilityVoidEnergy {
             event.getData().setTag(ID.toString(), ((VoidEnergy) voidStorage).serializeNBT());
         }
         */
-        /*
-        @Deprecated
-        @SubscribeEvent
-        public static void chunkUnload(final ChunkEvent.Unload event) {
-            final IVoidHolder voidHolder = getVoidEnergyHolder(event.getWorld());
-            if (!(voidHolder instanceof IVoidHolderModifiable)) return;
 
-            ((IVoidHolderModifiable) voidHolder).removeVoidEnergy(event.getChunk().getPos());
-        }
-        */
         @SubscribeEvent
         public static void chunkWatch(final ChunkWatchEvent.Watch event) {
             final EntityPlayerMP player = event.getPlayer();
-            final Chunk chunk = event.getChunkInstance();
-            if(chunk == null) return;
-
-            final IVoidStorage voidStorage = getVoidEnergy(chunk);
-            if(voidStorage == null) return;
+            final IVoidStorage voidStorage = getVoidEnergy(event.getChunkInstance());
+            if (voidStorage == null) return;
 
             PlentifulUtilities.network.sendTo(new MessageUpdateVoidValue(voidStorage), player);
+        }
+
+        @SubscribeEvent
+        public static void chunkUnload(final ChunkEvent.Unload event) {
+            ChunkPos chunkPos = event.getChunk().getPos();
+            IVoidStorage voidStorage = getVoidEnergy(event.getChunk());
+            VOID_CHUNKS_LOADED.remove(chunkPos);
+        }
+
+        @SubscribeEvent
+        public static void chunkLoad(final ChunkEvent.Load event) {
+            ChunkPos chunkPos = event.getChunk().getPos();
+            IVoidStorage voidStorage = getVoidEnergy(event.getChunk());
+            VOID_CHUNKS_LOADED.put(chunkPos, voidStorage);
         }
 
         @SubscribeEvent
@@ -194,28 +189,14 @@ public class CapabilityVoidEnergy {
 
             if(!world.isRemote)
             {
-                System.out.println("outside for");
-                for(Map.Entry<ChunkPos, ForgeChunkManager.Ticket> entry : world.getPersistentChunks().entries())
+                for(Map.Entry<ChunkPos, IVoidStorage> entry : VOID_CHUNKS_LOADED.entrySet())
                 {
-                    System.out.println("within for");
-
-                    Chunk chunkToCheck = world.getChunkFromChunkCoords(entry.getKey().x, entry.getKey().z);
-                    final IVoidStorage voidStorage = CapabilityVoidEnergy.getVoidEnergy(chunkToCheck);
-                    System.out.println(voidStorage);
-                    if(voidStorage != null)
+                    IVoidStorage voidStorage = entry.getValue();
+                    if(voidStorage.getVoidStored() < BASE_CAPACITY)
                     {
-                        voidStorage.setTicksElapsed(voidStorage.getTicksElapsed()+1); //test and mess code
-                        if(voidStorage.getTicksElapsed() % 520 == 0)
-                        {
-                            System.out.println("tick!");
-                            voidStorage.receiveVoid(world.rand.nextInt(10), false);
-                        }
-                        if(voidStorage.getVoidStored() < DEFAULT_CAPACITY)
-                        {
-
-                        }
+                    //    ((VoidEnergy) voidStorage).receiveVoid((world.rand.nextInt(10)+ 1), false);
+                    //    PlentifulUtilities.network.sendToAll(new MessageUpdateVoidValue(voidStorage));
                     }
-                    else { System.out.println("debug: skipped chunk as it had no void storage!"); /*todo remove debug*/ }
                 }
             }
         }

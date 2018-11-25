@@ -2,6 +2,7 @@ package unassigned.plentifulutilities.voidenergy.base.energy;
 
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 
 /**
  * This code is derived from IEnergyStorage owned by cofh and the forge team! This code has been modified to fit my needs, however, credit
@@ -19,9 +20,11 @@ public interface IVoidStorage {
 
     int getTicksElapsed();
 
-    void setTicksElapsed(int ticks);
+    void setTicksElapsed(final int ticks);
 
     World getWorld();
 
     ChunkPos getChunkPos();
+
+    Chunk[] getNearbyChunks();
 }

@@ -2,8 +2,10 @@ package unassigned.plentifulutilities.voidenergy.capability;
 
 import unassigned.plentifulutilities.voidenergy.base.IVoidStorageCustom;
 
+import java.util.Random;
+
 /**
-    Most of this class is not my code! This class is mostly derived from MinecraftForge/cofh's EnergyStorage.class. This code has been modified to fit my needs!
+    Most of this class is not my code! This class is mostly derived from MinecraftForge's EnergyStorage.class
  */
 public class VoidStorage implements IVoidStorageCustom {
 
@@ -12,29 +14,32 @@ public class VoidStorage implements IVoidStorageCustom {
     protected int maxReceive;
     protected int maxExtract;
     protected int ticks;
+    protected int dangerThreshold;
 
     public VoidStorage(int capacity)
     {
-        this(capacity, capacity, capacity, 0, 0);
+        this(capacity, capacity, capacity, 0);
     }
 
     public VoidStorage(int capacity, int maxTransfer)
     {
-        this(capacity, maxTransfer, maxTransfer, 0, 0);
+        this(capacity, maxTransfer, maxTransfer, 0);
     }
 
     public VoidStorage(int capacity, int maxReceive, int maxExtract)
     {
-        this(capacity, maxReceive, maxExtract, 0, 0);
+        this(capacity, maxReceive, maxExtract, 0);
     }
 
-    public VoidStorage(int capacity, int maxReceive, int maxExtract, int energy, int ticks)
+    public VoidStorage(int capacity, int maxReceive, int maxExtract, int energy)
     {
-        this.capacity = capacity;
         this.maxReceive = maxReceive;
         this.maxExtract = maxExtract;
-        this.ticks = ticks;
         this.energy = Math.max(0 , Math.min(capacity, energy));
+        this.capacity = capacity;
+
+        this.dangerThreshold = capacity - (capacity / 4);
+        this.ticks = 0;
     }
 
     @Override
@@ -56,24 +61,17 @@ public class VoidStorage implements IVoidStorageCustom {
     }
 
     @Override
-    public int getVoidStored()
-    {
-        return energy;
+    public int getVoidStored() {
+        return this.energy;
     }
 
     @Override
     public int getMaxVoidStored()
     {
-        return capacity;
+        return this.capacity;
     }
 
     @Override
-    public int getTicksElapsed() {
-        return ticks;
-    }
+    public int getDangerThreshold() { return this.dangerThreshold; }
 
-    @Override
-    public void setTicksElapsed(int ticks) {
-        this.ticks = ticks;
-    }
 }

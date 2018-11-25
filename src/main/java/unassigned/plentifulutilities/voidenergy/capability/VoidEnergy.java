@@ -7,12 +7,15 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import unassigned.plentifulutilities.PlentifulUtilities;
 import unassigned.plentifulutilities.network.MessageUpdateVoidValue;
 import unassigned.plentifulutilities.voidenergy.base.energy.IVoidStorage;
+
+import javax.annotation.Nullable;
 
 /**
  * This code is under the GNU General Public License v3.0
@@ -29,12 +32,14 @@ public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSeriali
 
     private final ChunkPos chunkPos;
 
-    public VoidEnergy(final int capacity, final World world, final ChunkPos chunkPos){
+    private final Chunk[] nearbyChunks = new Chunk[4]; //four adjacent chunks (above[y+1], right[x+1], bottom[z-1], left[z-1])
+
+    public VoidEnergy(final int capacity, final int baseEnergy, final World world, final ChunkPos chunkPos){
         super(capacity);
         this.world = world;
         this.chunkPos = chunkPos;
 
-        energy = capacity;
+        energy = baseEnergy;
     }
 
     @Override
@@ -42,6 +47,7 @@ public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSeriali
         NBTTagCompound tag = new NBTTagCompound();
         tag.setInteger("VoidStored", getVoidStored());
         tag.setInteger("TicksElapsed", getTicksElapsed());
+        tag.setInteger("MaxVoidStored", getMaxVoidStored());
 
         return tag;
     }
@@ -50,6 +56,7 @@ public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSeriali
     public void deserializeNBT(NBTTagCompound nbt) {
         energy = nbt.getInteger("VoidStored");
         ticks = nbt.getInteger("TicksElapsed");
+        capacity = nbt.getInteger("MaxVoidStored");
     }
 
     @Override
@@ -68,6 +75,7 @@ public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSeriali
 
         if(!simulate && voidReceived != 0) onVoidChanged();
 
+        onVoidChanged();
         return voidReceived;
     }
 
@@ -80,15 +88,42 @@ public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSeriali
         return voidExtracted;
     }
 
+    @Nullable
+    @Override
+    public Chunk[] getNearbyChunks(){
+        World world = this.getWorld();
+        ChunkPos orginChunk = this.getChunkPos();
+
+        @Nullable
+        Chunk topChunk = world.getChunkFromChunkCoords(orginChunk.x+0, orginChunk.z+1);
+        @Nullable
+        Chunk rightChunk = world.getChunkFromChunkCoords(orginChunk.x+1, orginChunk.z+0);
+        @Nullable
+        Chunk bottomChunk = world.getChunkFromChunkCoords(orginChunk.x+0, orginChunk.z-1);
+        @Nullable
+        Chunk leftChunk = world.getChunkFromChunkCoords(orginChunk.x-1, orginChunk.z+0);
+
+        return new Chunk[] {topChunk, rightChunk, bottomChunk, leftChunk }; //0 - top, 1 - right, 2 - bottom, 3 - left; NOTE these chunks CAN BE NULL, as they can be considered UNLOADED
+    }
+
     public void setVoidEnergy(final int energy){
         this.energy = energy;
         onVoidChanged();
     }
 
-    @Override
-    public void setTicksElapsed(final int ticks){
-        this.ticks = ticks;
+    public void setMaxVoidEnergy(final int maxVoidEnergy){
+        this.capacity = maxVoidEnergy;
         onVoidChanged();
+    }
+
+    @Override
+    public int getTicksElapsed() {
+        return ticks;
+    }
+
+    @Override
+    public void setTicksElapsed(int ticks) {
+        this.ticks = ticks;
     }
 
     /**
@@ -106,8 +141,10 @@ public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSeriali
         final PlayerChunkMapEntry playerchunkMapEntry = ((WorldServer) world).getPlayerChunkMap().getEntry(chunkPos.x, chunkPos.z);
         if(playerchunkMapEntry == null) return;
 
+        System.out.println("sending packet!");
         final IMessage message = new MessageUpdateVoidValue(this);
-        PlentifulUtilities.network.sendToAllTracking(message, new NetworkRegistry.TargetPoint(world.provider.getDimension(), chunkOrigin.getX(), chunkOrigin.getY(), chunkOrigin.getZ(), 0));
+        playerchunkMapEntry.sendPacket(PlentifulUtilities.network.getPacketFrom(message));
+        //PlentifulUtilities.network.sendToAllTracking(message, new NetworkRegistry.TargetPoint(world.provider.getDimension(), chunkOrigin.getX(), chunkOrigin.getY(), chunkOrigin.getZ(), 0));
     }
 
 }

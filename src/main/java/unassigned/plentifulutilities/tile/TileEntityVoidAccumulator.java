@@ -1,6 +1,7 @@
 package unassigned.plentifulutilities.tile;
 
 import com.mojang.authlib.GameProfile;
+import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;

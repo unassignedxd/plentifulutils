@@ -2,6 +2,7 @@ package unassigned.plentifulutilities.utils;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import unassigned.plentifulutilities.PlentifulUtilities;
 import unassigned.plentifulutilities.utils.registry.RegistryHandler;
 import unassigned.plentifulutilities.blocks.base.ItemBlockBase;
 
@@ -23,12 +24,14 @@ public class RegistryUtil {
 
         itemBlock.setRegistryName(block.getRegistryName());
         itemBlock.setUnlocalizedName(block.getUnlocalizedName());
+        itemBlock.setCreativeTab(PlentifulUtilities.creativeTab);
         RegistryHandler.ITEM_LIST.add(itemBlock);
     }
 
     public static void registerItem(Item item, String name){
         item.setRegistryName(ModUtil.MODID, name);
         item.setUnlocalizedName(name);
+        item.setCreativeTab(PlentifulUtilities.creativeTab);
         RegistryHandler.ITEM_LIST.add(item);
     }
 }
