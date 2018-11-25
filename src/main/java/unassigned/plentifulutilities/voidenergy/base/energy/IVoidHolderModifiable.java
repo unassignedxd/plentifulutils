@@ -11,6 +11,7 @@ import net.minecraft.util.math.ChunkPos;
  * ---
  * Created on 11/23/2018 for plentifulutils
  */
+@Deprecated
 public interface IVoidHolderModifiable extends IVoidHolder {
 
     void setVoidEnergy(final ChunkPos chunkPos, final IVoidStorage voidStorage);

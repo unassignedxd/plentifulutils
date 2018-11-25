@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
  * ---
  * Created on 11/23/2018 for plentifulutils
  */
+@Deprecated
 public interface IVoidHolder {
 
     @Nullable
