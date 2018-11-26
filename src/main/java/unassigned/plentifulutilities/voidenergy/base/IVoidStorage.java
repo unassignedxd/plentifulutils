@@ -1,4 +1,4 @@
-package unassigned.plentifulutilities.voidenergy.base.energy;
+package unassigned.plentifulutilities.voidenergy.base;
 
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;

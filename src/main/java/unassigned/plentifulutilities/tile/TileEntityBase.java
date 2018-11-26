@@ -17,6 +17,7 @@ import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import unassigned.plentifulutilities.tile.interfacing.IGiveEnergy;
+import unassigned.plentifulutilities.tile.interfacing.IGiveVoid;
 import unassigned.plentifulutilities.utils.ModUtil;
 import unassigned.plentifulutilities.utils.TEDispatcher;
 import unassigned.plentifulutilities.utils.TileUtil;
@@ -140,7 +141,7 @@ public class TileEntityBase extends TileEntity implements ITickable { //ITickabl
     }
 
     public boolean shouldSaveData() {
-        return this instanceof IGiveEnergy;
+        return this instanceof IGiveEnergy || this instanceof IGiveVoid;
     }
 
     protected boolean sendUpdateWithInterval(){

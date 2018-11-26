@@ -1,4 +1,4 @@
-package unassigned.plentifulutilities.voidenergy.base;
+package unassigned.plentifulutilities.voidenergy.base.energy;
 
 /**
  * This code is under the GNU General Public License v3.0

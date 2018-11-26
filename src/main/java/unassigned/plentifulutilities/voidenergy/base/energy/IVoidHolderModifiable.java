@@ -1,6 +1,7 @@
 package unassigned.plentifulutilities.voidenergy.base.energy;
 
 import net.minecraft.util.math.ChunkPos;
+import unassigned.plentifulutilities.voidenergy.base.IVoidStorage;
 
 /**
  * This code is under the GNU General Public License v3.0

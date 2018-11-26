@@ -20,11 +20,11 @@ public class RegistryUtil {
     public static void registerBlock(Block block, ItemBlockBase itemBlock, String name) {
         block.setRegistryName(ModUtil.MODID, name);
         block.setUnlocalizedName(name);
+        block.setCreativeTab(PlentifulUtilities.creativeTab);
         RegistryHandler.BLOCKS_LIST.add(block);
 
         itemBlock.setRegistryName(block.getRegistryName());
         itemBlock.setUnlocalizedName(block.getUnlocalizedName());
-        itemBlock.setCreativeTab(PlentifulUtilities.creativeTab);
         RegistryHandler.ITEM_LIST.add(itemBlock);
     }
 

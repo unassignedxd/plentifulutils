@@ -9,8 +9,10 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import unassigned.plentifulutilities.items.base.ItemBase;
-import unassigned.plentifulutilities.voidenergy.base.energy.IVoidStorage;
+import unassigned.plentifulutilities.voidenergy.base.IVoidStorage;
+import unassigned.plentifulutilities.voidenergy.base.VoidStorage;
 import unassigned.plentifulutilities.voidenergy.capability.CapabilityVoidEnergy;
+import unassigned.plentifulutilities.voidenergy.capability.VoidEnergy;
 
 /**
  * This code is under the GNU General Public License v3.0

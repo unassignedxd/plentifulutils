@@ -1,8 +1,6 @@
-package unassigned.plentifulutilities.voidenergy.capability;
+package unassigned.plentifulutilities.voidenergy.base;
 
-import unassigned.plentifulutilities.voidenergy.base.IVoidStorageCustom;
-
-import java.util.Random;
+import unassigned.plentifulutilities.voidenergy.base.energy.IVoidStorageCustom;
 
 /**
     Most of this class is not my code! This class is mostly derived from MinecraftForge's EnergyStorage.class
@@ -13,6 +11,7 @@ public class VoidStorage implements IVoidStorageCustom {
     protected int capacity;
     protected int maxReceive;
     protected int maxExtract;
+
     protected int ticks;
     protected int dangerThreshold;
 
@@ -48,6 +47,7 @@ public class VoidStorage implements IVoidStorageCustom {
         int energyReceived = Math.min(capacity - energy, Math.min(this.maxReceive, maxReceive));
         if (!simulate)
             energy += energyReceived;
+
         return energyReceived;
     }
 
@@ -57,6 +57,7 @@ public class VoidStorage implements IVoidStorageCustom {
         int energyExtracted = Math.min(energy, Math.min(this.maxExtract, maxExtract));
         if (!simulate)
             energy -= energyExtracted;
+
         return energyExtracted;
     }
 

@@ -1,7 +1,6 @@
 package unassigned.plentifulutilities.voidenergy.capability;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.server.management.PlayerChunkMapEntry;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -13,7 +12,8 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import unassigned.plentifulutilities.PlentifulUtilities;
 import unassigned.plentifulutilities.network.MessageUpdateVoidValue;
-import unassigned.plentifulutilities.voidenergy.base.energy.IVoidStorage;
+import unassigned.plentifulutilities.voidenergy.base.IVoidStorage;
+import unassigned.plentifulutilities.voidenergy.base.VoidStorage;
 
 import javax.annotation.Nullable;
 
@@ -143,8 +143,7 @@ public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSeriali
 
         System.out.println("sending packet!");
         final IMessage message = new MessageUpdateVoidValue(this);
-        playerchunkMapEntry.sendPacket(PlentifulUtilities.network.getPacketFrom(message));
-        //PlentifulUtilities.network.sendToAllTracking(message, new NetworkRegistry.TargetPoint(world.provider.getDimension(), chunkOrigin.getX(), chunkOrigin.getY(), chunkOrigin.getZ(), 0));
+        PlentifulUtilities.network.sendToAllTracking(message, new NetworkRegistry.TargetPoint(world.provider.getDimension(), chunkOrigin.getX(), chunkOrigin.getY(), chunkOrigin.getZ(), 0));
     }
 
 }

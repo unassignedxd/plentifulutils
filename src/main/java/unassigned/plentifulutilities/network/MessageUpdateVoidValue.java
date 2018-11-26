@@ -7,10 +7,9 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import unassigned.plentifulutilities.PlentifulUtilities;
-import unassigned.plentifulutilities.voidenergy.base.energy.IVoidStorage;
+import unassigned.plentifulutilities.voidenergy.base.IVoidStorage;
 import unassigned.plentifulutilities.voidenergy.capability.CapabilityVoidEnergy;
 import unassigned.plentifulutilities.voidenergy.capability.VoidEnergy;
-import unassigned.plentifulutilities.voidenergy.capability.VoidStorage;
 
 import javax.annotation.Nullable;
 

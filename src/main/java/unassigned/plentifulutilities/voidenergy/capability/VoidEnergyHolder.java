@@ -2,7 +2,7 @@ package unassigned.plentifulutilities.voidenergy.capability;
 
 import net.minecraft.util.math.ChunkPos;
 import unassigned.plentifulutilities.voidenergy.base.energy.IVoidHolderModifiable;
-import unassigned.plentifulutilities.voidenergy.base.energy.IVoidStorage;
+import unassigned.plentifulutilities.voidenergy.base.IVoidStorage;
 
 import javax.annotation.Nullable;
 import java.util.Map;

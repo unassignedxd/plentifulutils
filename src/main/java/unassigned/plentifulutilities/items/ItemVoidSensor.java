@@ -13,7 +13,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import unassigned.plentifulutilities.items.base.ItemBase;
 import unassigned.plentifulutilities.utils.ModUtil;
-import unassigned.plentifulutilities.voidenergy.base.energy.IVoidStorage;
+import unassigned.plentifulutilities.voidenergy.base.IVoidStorage;
 import unassigned.plentifulutilities.voidenergy.capability.CapabilityVoidEnergy;
 
 /**

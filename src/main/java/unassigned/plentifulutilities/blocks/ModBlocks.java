@@ -20,9 +20,11 @@ public class ModBlocks {
 
     public static Block testBlock;
     public static Block voidAccumulator;
+    public static Block voidCable;
 
     public static void init(){
         testBlock = new BlockBase(Material.ROCK,"block_test");
         voidAccumulator = new BlockVoidAccumulator("block_void_accumulator");
+        voidCable = new BlockVoidCable("block_void_cable");
     }
 }

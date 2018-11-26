@@ -1,7 +1,7 @@
 package unassigned.plentifulutilities.voidenergy.base.energy;
 
 import net.minecraft.util.math.ChunkPos;
-import unassigned.plentifulutilities.voidenergy.base.energy.IVoidStorage;
+import unassigned.plentifulutilities.voidenergy.base.IVoidStorage;
 
 import javax.annotation.Nullable;
 
@@ -14,7 +14,6 @@ import javax.annotation.Nullable;
  * ---
  * Created on 11/23/2018 for plentifulutils
  */
-@Deprecated
 public interface IVoidHolder {
 
     @Nullable
