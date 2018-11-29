@@ -7,6 +7,7 @@ import unassigned.plentifulutilities.voidenergy.base.IVoidStorage;
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This code is under the GNU General Public License v3.0
@@ -19,7 +20,7 @@ import java.util.HashMap;
  */
 public class VoidEnergyHolder implements IVoidHolderModifiable {
 
-    private static final Map<ChunkPos, IVoidStorage> voidEnergies = new HashMap<>();
+    private static final ConcurrentHashMap<ChunkPos, IVoidStorage> voidEnergies = new ConcurrentHashMap<>();
 
     @Nullable
     @Override

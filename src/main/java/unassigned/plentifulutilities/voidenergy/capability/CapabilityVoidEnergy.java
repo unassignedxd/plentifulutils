@@ -1,10 +1,12 @@
 package unassigned.plentifulutilities.voidenergy.capability;
 
+import net.minecraft.entity.item.EntityTNTPrimed;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -12,6 +14,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.ChunkWatchEvent;
@@ -29,6 +32,7 @@ import unassigned.plentifulutilities.voidenergy.base.energy.IVoidHolderModifiabl
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * This code is not owned by me! This is a test derived from Choonster's TestMod3. This code, however, has been modified to fit my current needs -
@@ -47,8 +51,8 @@ public class CapabilityVoidEnergy {
 
     public static final EnumFacing DEFAULT_FACING = null;
 
-    public static final int DEFAULT_ENERGY = 3000;
-    public static final int BASE_CAPACITY = 6000;
+    public static final int DEFAULT_ENERGY = 5000;
+    public static final int BASE_CAPACITY = 10000;
 
     public static final ArrayList<ChunkPos> LOADED_CHUNKS_POS = new ArrayList<>();
 
@@ -72,7 +76,6 @@ public class CapabilityVoidEnergy {
             public NBTBase writeNBT(final Capability<IVoidStorage> capability, final IVoidStorage instance, final EnumFacing side) {
                 NBTTagCompound tag = new NBTTagCompound();
                 tag.setInteger("voidStored", instance.getVoidStored());
-                tag.setInteger("ticksElapsed", instance.getTicksElapsed());
                 tag.setInteger("maxVoidStored", instance.getMaxVoidStored());
                 return tag;
             }
@@ -83,7 +86,6 @@ public class CapabilityVoidEnergy {
                     throw new IllegalArgumentException("Given incorrect instance from implementation");
 
                 ((VoidEnergy) instance).setVoidEnergy(((NBTTagCompound)nbt).getInteger("voidStored"));
-                ((VoidEnergy) instance).setTicksElapsed(((NBTTagCompound)nbt).getInteger("ticksElapsed"));
                 ((VoidEnergy) instance).setMaxVoidEnergy(((NBTTagCompound)nbt).getInteger("maxVoidStored"));
             }
         }, () -> null);
@@ -120,36 +122,6 @@ public class CapabilityVoidEnergy {
             event.addCapability(ID, new CapabilityProviderSerializable<>(CHUNK_VOID_STORAGE, DEFAULT_FACING, voidStorage));
         }
 
-        /*
-        @Deprecated
-        @SubscribeEvent
-        public static void chunkDataLoad(final ChunkDataEvent.Load event) {
-            final World world = event.getWorld();
-            final ChunkPos chunkPos = event.getChunk().getPos();
-
-            final VoidEnergy voidEnergy = new VoidEnergy(DEFAULT_CAPACITY, world, chunkPos);
-
-            final NBTTagCompound chunkData = event.getData();
-            if (chunkData.hasKey(ID.toString(), Constants.NBT.TAG_INT)) {
-                final NBTTagInt energyTag = (NBTTagInt) chunkData.getTag(ID.toString());
-                voidEnergy.deserializeNBT(energyTag);
-            }
-
-            ((IVoidHolderModifiable) voidHolder).setVoidEnergy(chunkPos, voidEnergy);
-        }
-        */
-
-        /*
-        @Deprecated
-        @SubscribeEvent
-        public static void chunkDataSave(final ChunkDataEvent.Save event) {
-            final IVoidStorage voidStorage = getVoidEnergy(event.getChunk());
-            if (!(voidStorage instanceof VoidEnergy)) return;
-
-            event.getData().setTag(ID.toString(), ((VoidEnergy) voidStorage).serializeNBT());
-        }
-        */
-
         @SubscribeEvent
         public static void chunkWatch(final ChunkWatchEvent.Watch event) {
             final EntityPlayerMP player = event.getPlayer();
@@ -184,27 +156,104 @@ public class CapabilityVoidEnergy {
             ((IVoidHolderModifiable) chunkEnergyHolder).removeVoidEnergy(event.getChunk().getPos());
         }
 
-        private static int globalVoidEvent;
+        private static int globalVoidEvent; //this doesn't need to save to NBT as its actual value is unimportant
+        private static int LOWER_THRESHOLD = (int)(DEFAULT_ENERGY / 2); //The lower threshold where void regen will occur
+        private static int UPPER_THRESHOLD = (int)(DEFAULT_ENERGY * 1.5); //The upper threshold where void will disperse
+        private static int DANGER_HIGH_THRESHOLD = (int)(DEFAULT_ENERGY * 1.8); //The high danger threshold where void will become unstable
+        private static int DANGER_LOW_THRESHOLD = (int)(DEFAULT_ENERGY / 5); //The low danger threshold where void will become unstable
+
+        private static int dangerTick;
 
         @SubscribeEvent
-        public static void onWorldTick(final TickEvent.WorldTickEvent event){
+        public static void onWorldTick(final TickEvent.WorldTickEvent event) {
             World world = event.world;
+            Random rand = world.rand;
             globalVoidEvent++;
 
-            if(globalVoidEvent % 100 == 0)
+            if(globalVoidEvent % 20 == 0) //every second update
             {
                 for(ChunkPos pos : VoidEnergyHolder.getVoidEnergies().keySet())
                 {
-                    IVoidStorage voidStorage = getVoidEnergy(world.getChunkFromChunkCoords(pos.x, pos.z));
-                    if(voidStorage != null)
+                    if(pos == null) return;
+
+                    IVoidStorage thisStorage = getVoidEnergy(world.getChunkFromChunkCoords(pos.x, pos.z));
+                    if(thisStorage == null) return;
+
+                    if(thisStorage.getVoidStored() < LOWER_THRESHOLD)
                     {
-                        if(voidStorage.getVoidStored() < DEFAULT_ENERGY)
+                        if(globalVoidEvent % 160 == 0) { thisStorage.receiveVoid(1, false); } //idle regen
+
+                        if(thisStorage.getNearbyChunks() != null)
                         {
-                            voidStorage.receiveVoid(5, false);
+                            for(Chunk chunk : thisStorage.getNearbyChunks())
+                            {
+                                if(chunk == null) return;
+
+                                IVoidStorage otherStorage = getVoidEnergy(chunk);
+                                if(otherStorage == null) return;
+
+                                if(otherStorage.getVoidStored() > LOWER_THRESHOLD)
+                                {
+                                    int scaledAmt = (int)((float)(LOWER_THRESHOLD - thisStorage.getVoidStored()) / 500) + 1; //2500 - 2500 = 0 -> 1; 2500 - 2000 > 500 / 500 = 1 -> 2;
+                                    thisStorage.receiveVoid(scaledAmt, false);
+                                    otherStorage.extractVoid(scaledAmt, false);
+                                }
+                            }
                         }
+
+                        if(thisStorage.getVoidStored() < DANGER_LOW_THRESHOLD)
+                        {
+                            //bad stuff happens here. However, should seem opposite of what happens during a HIGH energy event (ex. black hole)
+                            //this should create a large amount of void.
+                        }
+                    }
+
+                    if(thisStorage.getVoidStored() > UPPER_THRESHOLD)
+                    {
+                        if(globalVoidEvent % 160 == 0) { thisStorage.extractVoid(1, false); } //idle loss
+
+                        if(thisStorage.getNearbyChunks() != null)
+                        {
+                            for(Chunk chunk : thisStorage.getNearbyChunks())
+                            {
+                                if(chunk == null) return;
+
+                                IVoidStorage otherStorage = getVoidEnergy(chunk);
+                                if(otherStorage == null) return;
+
+                                //No if check as this will give its energy to anything possible as its 'pre-unstable'
+                                int scaledAmt = (int)((float)(thisStorage.getVoidStored() - UPPER_THRESHOLD) / 500) + 1; //math: 7500 - 7500 > 0 / 1000 = 0; 8000 - 7500 > 500 / 500 = 1. 9000 - 7500 > 1500 / 500 > 3; The goal of this is to release more energy based on how high the energy is.
+                                otherStorage.receiveVoid(scaledAmt, false);
+                                thisStorage.extractVoid(scaledAmt, false);
+                            }
+                        }
+
+                        if(thisStorage.getVoidStored() > DANGER_HIGH_THRESHOLD) //todo tommorow: make ticks alive within chunk- if doesnt work as each instance is being called.
+                        {
+                            //bad stuff happens here. However, should be opposite of what happens during a LOW energy event (ex. explosion)
+                            // this should discharge a large amount of void. possibly make this a dangerous way to gather energy
+                            dangerTick++; //ticks every second
+
+                            if(dangerTick == 2) { System.out.println("WARNING! HIGH VOID EVENT DETECTED!"); }
+                            System.out.println(dangerTick);
+
+                            if(dangerTick >= 30) //30 seconds
+                            {
+                                int x = thisStorage.getChunkPos().x * 16;
+                                int z = thisStorage.getChunkPos().z * 16;
+                                int y = world.getHeight(x, z);
+
+                                world.createExplosion(null, x, y, z, (thisStorage.getVoidStored() / 1000), false);
+                                System.out.println("DISCHARGE EVENT! at: " + x + " y: " + y + "  z: " + z);
+                                thisStorage.extractVoid(thisStorage.getVoidStored()/3, false);
+                                dangerTick=0;
+                            }
+                        }else { /*dangerTick=0;*/ }
                     }
                 }
             }
+
         }
+
     }
 }

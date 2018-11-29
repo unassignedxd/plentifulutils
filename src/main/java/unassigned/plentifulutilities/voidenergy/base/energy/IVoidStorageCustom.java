@@ -18,6 +18,4 @@ public interface IVoidStorageCustom {
     int getVoidStored();
 
     int getMaxVoidStored();
-
-    int getDangerThreshold();
 }

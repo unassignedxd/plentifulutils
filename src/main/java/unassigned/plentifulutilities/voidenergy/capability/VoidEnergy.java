@@ -2,6 +2,7 @@ package unassigned.plentifulutilities.voidenergy.capability;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.management.PlayerChunkMapEntry;
+import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -46,7 +47,6 @@ public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSeriali
     public NBTTagCompound serializeNBT() {
         NBTTagCompound tag = new NBTTagCompound();
         tag.setInteger("VoidStored", getVoidStored());
-        tag.setInteger("TicksElapsed", getTicksElapsed());
         tag.setInteger("MaxVoidStored", getMaxVoidStored());
 
         return tag;
@@ -55,7 +55,6 @@ public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSeriali
     @Override
     public void deserializeNBT(NBTTagCompound nbt) {
         energy = nbt.getInteger("VoidStored");
-        ticks = nbt.getInteger("TicksElapsed");
         capacity = nbt.getInteger("MaxVoidStored");
     }
 
@@ -116,16 +115,6 @@ public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSeriali
         onVoidChanged();
     }
 
-    @Override
-    public int getTicksElapsed() {
-        return ticks;
-    }
-
-    @Override
-    public void setTicksElapsed(int ticks) {
-        this.ticks = ticks;
-    }
-
     /**
      *  This section of the code was derived from Choonster. This code is not to be published publicly.
      *
@@ -141,7 +130,6 @@ public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSeriali
         final PlayerChunkMapEntry playerchunkMapEntry = ((WorldServer) world).getPlayerChunkMap().getEntry(chunkPos.x, chunkPos.z);
         if(playerchunkMapEntry == null) return;
 
-        System.out.println("sending packet!");
         final IMessage message = new MessageUpdateVoidValue(this);
         PlentifulUtilities.network.sendToAllTracking(message, new NetworkRegistry.TargetPoint(world.provider.getDimension(), chunkOrigin.getX(), chunkOrigin.getY(), chunkOrigin.getZ(), 0));
     }

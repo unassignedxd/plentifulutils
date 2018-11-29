@@ -12,9 +12,6 @@ public class VoidStorage implements IVoidStorageCustom {
     protected int maxReceive;
     protected int maxExtract;
 
-    protected int ticks;
-    protected int dangerThreshold;
-
     public VoidStorage(int capacity)
     {
         this(capacity, capacity, capacity, 0);
@@ -36,9 +33,6 @@ public class VoidStorage implements IVoidStorageCustom {
         this.maxExtract = maxExtract;
         this.energy = Math.max(0 , Math.min(capacity, energy));
         this.capacity = capacity;
-
-        this.dangerThreshold = capacity - (capacity / 4);
-        this.ticks = 0;
     }
 
     @Override
@@ -71,8 +65,5 @@ public class VoidStorage implements IVoidStorageCustom {
     {
         return this.capacity;
     }
-
-    @Override
-    public int getDangerThreshold() { return this.dangerThreshold; }
 
 }
