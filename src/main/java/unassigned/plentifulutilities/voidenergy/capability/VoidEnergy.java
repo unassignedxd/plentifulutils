@@ -12,11 +12,14 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import unassigned.plentifulutilities.PlentifulUtilities;
+import unassigned.plentifulutilities.blocks.ModBlocks;
 import unassigned.plentifulutilities.network.MessageUpdateVoidValue;
+import unassigned.plentifulutilities.utils.VoidUtil;
 import unassigned.plentifulutilities.voidenergy.base.IVoidStorage;
 import unassigned.plentifulutilities.voidenergy.base.VoidStorage;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 
 /**
  * This code is under the GNU General Public License v3.0
@@ -92,10 +95,11 @@ public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSeriali
 
     @Nullable
     @Override
-    public Chunk[] getNearbyChunks(){
+    public ArrayList<Chunk> getNearbyChunks(){
         World world = this.getWorld();
         ChunkPos orginChunk = this.getChunkPos();
-
+        ArrayList<Chunk> chunks = new ArrayList<>();
+        /*
         @Nullable
         Chunk topChunk = world.getChunkFromChunkCoords(orginChunk.x+0, orginChunk.z+1);
         @Nullable
@@ -104,8 +108,16 @@ public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSeriali
         Chunk bottomChunk = world.getChunkFromChunkCoords(orginChunk.x+0, orginChunk.z-1);
         @Nullable
         Chunk leftChunk = world.getChunkFromChunkCoords(orginChunk.x-1, orginChunk.z+0);
+        */
+        for(int x = -1; x <= 1; x++)
+        {
+            for(int z = -1; z <= 1; z++)
+            {
+                chunks.add(world.getChunkFromChunkCoords(orginChunk.x+x, orginChunk.z+z));
+            }
+        } //this considers chunks in a 3x3 area [this will include the ORGIN chunk]
 
-        return new Chunk[] {topChunk, rightChunk, bottomChunk, leftChunk }; //0 - top, 1 - right, 2 - bottom, 3 - left; NOTE these chunks CAN BE NULL, as they can be considered UNLOADED
+        return chunks;
     }
 
     public void setVoidEnergy(final int energy){
@@ -120,9 +132,68 @@ public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSeriali
         this.dangerEventTicks = loadedTicks;
         onVoidChanged();
     }
+    /*
+        Call this every void update.
+     */
+    public void updateVoid(int curTick)
+    {
+        int thresholdLow = CapabilityVoidEnergy.VoidHandler.LOWER_THRESHOLD;
+        int thresholdHigh = CapabilityVoidEnergy.VoidHandler.UPPER_THRESHOLD;
+        int dangerHigh = CapabilityVoidEnergy.VoidHandler.DANGER_HIGH_THRESHOLD;
+        int dangerLow = CapabilityVoidEnergy.VoidHandler.DANGER_LOW_THRESHOLD;
 
-    public void updateDangerTicks() {
-        this.dangerEventTicks++; //this should not be called every tick, but more probably every second.
+        if(getVoidStored() < thresholdLow || getVoidStored() > thresholdHigh)
+        {
+            if(this.getNearbyChunks() == null) return;
+
+            for(Chunk chunk : this.getNearbyChunks())
+            {
+                if(chunk == null || (chunk.getPos() == chunkPos)) return;
+
+                IVoidStorage nearStorage = CapabilityVoidEnergy.getVoidEnergy(chunk);
+                if(nearStorage == null) return;
+
+                if(getVoidStored() > thresholdHigh)
+                {
+                    int scaledAmt = (int)((float)(this.getVoidStored() - thresholdHigh) / 1000) + 1;
+                    this.extractVoid(scaledAmt, false);
+                    nearStorage.receiveVoid(scaledAmt, false);
+                }else if(getVoidStored() < thresholdLow)
+                {
+                    int scaledAmt = (int)((float)(thresholdLow - this.getVoidStored()) / 1000) + 1;
+                    this.receiveVoid(scaledAmt, false);
+                    nearStorage.extractVoid(scaledAmt, false);
+                }
+
+            }
+        }
+
+        if(getVoidStored() < dangerLow || getVoidStored() > dangerHigh)
+        {
+            updateDangerTicks(dangerHigh, dangerLow);
+        }
+    }
+
+    public void updateDangerTicks(int dangerHigh, int dangerLow) {
+        this.dangerEventTicks++;
+
+        if(this.energy > dangerHigh)
+        {
+            VoidUtil.spawnParticlesRandomWithinChunk(this.world, this.chunkPos, 10);
+
+            if(dangerEventTicks == 60)
+            {
+                VoidUtil.spawnParticlesInMiddleChunk(this.world, this.chunkPos);
+            }
+            if(dangerEventTicks == 64)
+            {
+                VoidUtil.setBlockStateInMiddleChunk(this.world, this.chunkPos, ModBlocks.voidHole);
+            }
+
+        }else if(this.energy < dangerLow)
+        {
+        }
+
         onVoidChanged();
     }
 

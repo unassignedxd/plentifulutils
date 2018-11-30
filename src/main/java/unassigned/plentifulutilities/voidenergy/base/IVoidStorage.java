@@ -4,6 +4,8 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
+import java.util.ArrayList;
+
 /**
  * This code is derived from IEnergyStorage owned by cofh and the forge team! This code has been modified to fit my needs, however, credit
  * should go towards the individuals stated above.
@@ -22,7 +24,7 @@ public interface IVoidStorage {
 
     ChunkPos getChunkPos();
 
-    Chunk[] getNearbyChunks();
+    ArrayList<Chunk> getNearbyChunks();
 
     int getDangerTicks();
 

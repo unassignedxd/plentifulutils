@@ -125,7 +125,7 @@ public class CapabilityVoidEnergy {
             final IVoidStorage voidStorage = getVoidEnergy(event.getChunkInstance());
             if (voidStorage == null) return;
 
-            PlentifulUtilities.network.sendTo(new MessageUpdateVoidValue(voidStorage), player);
+            PlentifulUtilities.network.sendToDimension(new MessageUpdateVoidValue(voidStorage), player.dimension);
         }
 
         @SubscribeEvent
@@ -154,6 +154,7 @@ public class CapabilityVoidEnergy {
         }
 
         private static int globalVoidEvent; //this doesn't need to save to NBT as its actual value is unimportant
+        private static int localTick; //this is updated once a second (every globalvoidevent % 20)
         public static int LOWER_THRESHOLD = (int)(DEFAULT_ENERGY / 2); //The lower threshold where void regen will occur
         public static int UPPER_THRESHOLD = (int)(DEFAULT_ENERGY * 1.5); //The upper threshold where void will disperse
         public static int DANGER_HIGH_THRESHOLD = (int)(DEFAULT_ENERGY * 1.8); //The high danger threshold where void will become unstable
@@ -167,13 +168,18 @@ public class CapabilityVoidEnergy {
 
             if(globalVoidEvent % 20 == 0)
             {
+                localTick++;
                 for(ChunkPos pos : VoidEnergyHolder.getVoidEnergies().keySet())
                 {
                     if(pos == null) return;
 
+
+
                     IVoidStorage thisStorage = getVoidEnergy(world.getChunkFromChunkCoords(pos.x, pos.z));
                     if(thisStorage == null) return;
 
+                    ((VoidEnergy) thisStorage).updateVoid(localTick);
+                    /*
                     if(thisStorage.getVoidStored() < LOWER_THRESHOLD)
                     {
                         if(globalVoidEvent % 160 == 0) { thisStorage.receiveVoid(1, false); } //idle regen
@@ -198,8 +204,6 @@ public class CapabilityVoidEnergy {
 
                         if(thisStorage.getVoidStored() < DANGER_LOW_THRESHOLD)
                         {
-                            //bad stuff happens here. However, should seem opposite of what happens during a HIGH energy event (ex. black hole)
-                            //this should create a large amount of void.
                             ((VoidEnergy)thisStorage).updateDangerTicks();
                         }
                     }
@@ -223,28 +227,15 @@ public class CapabilityVoidEnergy {
                                 thisStorage.extractVoid(scaledAmt, false);
                             }
                         }
-
                         if(thisStorage.getVoidStored() > DANGER_HIGH_THRESHOLD)
                         {
                             ((VoidEnergy)thisStorage).updateDangerTicks();
-                            int dangerTicks = ((VoidEnergy)thisStorage).getDangerTicks();
-
-                            if(dangerTicks == 2) { System.out.println("HIGH VOID EVENT STARTED!"); }
-
-                            VoidUtil.spawnParticlesRandomWithinChunk(world, pos);
-
-                            if(dangerTicks == 78)
-                            {
-                                VoidUtil.spawnParticlesInMiddleChunk(world, pos);
-                            }
-
-                            if(dangerTicks == 80)
-                            {
-                                VoidUtil.setBlockStateInMiddleChunk(world, pos);
-                            }
                         }
                     }
+*/
+
                 }
+
             }
 
         }
