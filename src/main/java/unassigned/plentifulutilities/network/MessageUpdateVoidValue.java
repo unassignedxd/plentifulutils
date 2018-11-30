@@ -28,6 +28,7 @@ public class MessageUpdateVoidValue implements IMessage {
 
     private int voidEnergy;
     private int capacity;
+    private int dangerTick;
 
     public MessageUpdateVoidValue() {
     }
@@ -35,7 +36,7 @@ public class MessageUpdateVoidValue implements IMessage {
     public MessageUpdateVoidValue(IVoidStorage voidStorage) {
         this.chunkPos = voidStorage.getChunkPos();
         this.voidEnergy = voidStorage.getVoidStored();
-        this.capacity = voidStorage.getMaxVoidStored();
+        this.dangerTick = voidStorage.getDangerTicks();
     }
 
     /**
@@ -49,7 +50,7 @@ public class MessageUpdateVoidValue implements IMessage {
         final int chunkZ = buf.readInt();
         chunkPos = new ChunkPos(chunkX, chunkZ);
         voidEnergy = buf.readInt();
-        capacity = buf.readInt();
+        dangerTick = buf.readInt();
     }
 
     /**
@@ -62,7 +63,7 @@ public class MessageUpdateVoidValue implements IMessage {
         buf.writeInt(chunkPos.x);
         buf.writeInt(chunkPos.z);
         buf.writeInt(voidEnergy);
-        buf.writeInt(capacity);
+        buf.writeInt(dangerTick);
     }
 
     public static class Handler implements IMessageHandler<MessageUpdateVoidValue, IMessage> {
@@ -78,7 +79,7 @@ public class MessageUpdateVoidValue implements IMessage {
                 if (!(vEnergy instanceof VoidEnergy)) return;
 
                 ((VoidEnergy) vEnergy).setVoidEnergy(message.voidEnergy);
-                ((VoidEnergy) vEnergy).setMaxVoidEnergy(message.capacity);
+                ((VoidEnergy) vEnergy).setDangerTicks(message.dangerTick);
             });
 
             return null;

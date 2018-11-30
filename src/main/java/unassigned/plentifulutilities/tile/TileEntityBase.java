@@ -103,6 +103,7 @@ public class TileEntityBase extends TileEntity implements ITickable { //ITickabl
 
     @Override
     public void update() {
+        this.ticksAlive++;
         if(doesGiveEnergy)
         {
             IGiveEnergy give = (IGiveEnergy)this;

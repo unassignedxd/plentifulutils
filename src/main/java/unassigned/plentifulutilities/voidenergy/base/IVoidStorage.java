@@ -23,4 +23,8 @@ public interface IVoidStorage {
     ChunkPos getChunkPos();
 
     Chunk[] getNearbyChunks();
+
+    int getDangerTicks();
+
+
 }

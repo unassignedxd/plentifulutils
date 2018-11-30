@@ -1,4 +1,4 @@
-package unassigned.plentifulutilities.utils;
+package unassigned.plentifulutilities.utils.capability;
 
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;

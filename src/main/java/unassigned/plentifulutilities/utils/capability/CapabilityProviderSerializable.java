@@ -1,4 +1,4 @@
-package unassigned.plentifulutilities.utils;
+package unassigned.plentifulutilities.utils.capability;
 
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;

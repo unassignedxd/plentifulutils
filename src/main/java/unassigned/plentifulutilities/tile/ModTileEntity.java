@@ -1,4 +1,4 @@
-package unassigned.plentifulutilities.utils.registry;
+package unassigned.plentifulutilities.tile;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -6,6 +6,7 @@ import unassigned.plentifulutilities.PlentifulUtilities;
 import unassigned.plentifulutilities.tile.TileEntityBase;
 import unassigned.plentifulutilities.tile.TileEntityVoidAccumulator;
 import unassigned.plentifulutilities.tile.TileEntityVoidCable;
+import unassigned.plentifulutilities.tile.TileEntityVoidHole;
 import unassigned.plentifulutilities.utils.ModUtil;
 
 /**
@@ -22,6 +23,7 @@ public class ModTileEntity {
     public static void init() {
         registerTE(TileEntityVoidAccumulator.class);
         registerTE(TileEntityVoidCable.class);
+        registerTE(TileEntityVoidHole.class);
     }
 
     private static void registerTE(Class<? extends TileEntityBase> teClass){ //accepts any class that extends TEB

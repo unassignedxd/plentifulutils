@@ -30,16 +30,15 @@ import javax.annotation.Nullable;
 public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSerializable<NBTTagCompound> {
 
     private final World world;
-
     private final ChunkPos chunkPos;
-
-    private final Chunk[] nearbyChunks = new Chunk[4]; //four adjacent chunks (above[y+1], right[x+1], bottom[z-1], left[z-1])
+    private int dangerEventTicks;
 
     public VoidEnergy(final int capacity, final int baseEnergy, final World world, final ChunkPos chunkPos){
         super(capacity);
         this.world = world;
         this.chunkPos = chunkPos;
 
+        this.dangerEventTicks = 0;
         energy = baseEnergy;
     }
 
@@ -47,7 +46,7 @@ public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSeriali
     public NBTTagCompound serializeNBT() {
         NBTTagCompound tag = new NBTTagCompound();
         tag.setInteger("VoidStored", getVoidStored());
-        tag.setInteger("MaxVoidStored", getMaxVoidStored());
+        tag.setInteger("DangerTicks", getDangerTicks());
 
         return tag;
     }
@@ -55,7 +54,7 @@ public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSeriali
     @Override
     public void deserializeNBT(NBTTagCompound nbt) {
         energy = nbt.getInteger("VoidStored");
-        capacity = nbt.getInteger("MaxVoidStored");
+        dangerEventTicks = nbt.getInteger("DangerTicks");
     }
 
     @Override
@@ -74,7 +73,6 @@ public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSeriali
 
         if(!simulate && voidReceived != 0) onVoidChanged();
 
-        onVoidChanged();
         return voidReceived;
     }
 
@@ -85,6 +83,11 @@ public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSeriali
         if (!simulate && voidExtracted != 0) onVoidChanged();
 
         return voidExtracted;
+    }
+
+    @Override
+    public int getMaxVoidStored() {
+        return this.capacity;
     }
 
     @Nullable
@@ -110,8 +113,16 @@ public class VoidEnergy extends VoidStorage implements IVoidStorage, INBTSeriali
         onVoidChanged();
     }
 
-    public void setMaxVoidEnergy(final int maxVoidEnergy){
-        this.capacity = maxVoidEnergy;
+    @Override
+    public int getDangerTicks() { return this.dangerEventTicks; }
+
+    public void setDangerTicks(final int loadedTicks) {
+        this.dangerEventTicks = loadedTicks;
+        onVoidChanged();
+    }
+
+    public void updateDangerTicks() {
+        this.dangerEventTicks++; //this should not be called every tick, but more probably every second.
         onVoidChanged();
     }
 

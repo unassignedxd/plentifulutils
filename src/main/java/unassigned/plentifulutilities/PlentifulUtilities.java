@@ -1,7 +1,5 @@
 package unassigned.plentifulutilities;
 
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.*;
 import net.minecraftforge.fml.common.Mod.*;
@@ -13,11 +11,10 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import unassigned.plentifulutilities.inventory.gui.GuiHandler;
-import unassigned.plentifulutilities.items.ModItems;
 import unassigned.plentifulutilities.network.ModMessages;
 import unassigned.plentifulutilities.proxies.IProxy;
 import unassigned.plentifulutilities.utils.ModUtil;
-import unassigned.plentifulutilities.utils.registry.ModTileEntity;
+import unassigned.plentifulutilities.tile.ModTileEntity;
 import unassigned.plentifulutilities.utils.registry.RegistryHandler;
 import unassigned.plentifulutilities.voidenergy.capability.CapabilityVoidEnergy;
 

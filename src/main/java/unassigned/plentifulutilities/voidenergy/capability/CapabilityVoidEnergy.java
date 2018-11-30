@@ -1,12 +1,10 @@
 package unassigned.plentifulutilities.voidenergy.capability;
 
-import net.minecraft.entity.item.EntityTNTPrimed;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -14,7 +12,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.ChunkWatchEvent;
@@ -23,10 +20,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import unassigned.plentifulutilities.PlentifulUtilities;
 import unassigned.plentifulutilities.network.MessageUpdateVoidValue;
-import unassigned.plentifulutilities.utils.CapabilityProviderSerializable;
+import unassigned.plentifulutilities.utils.capability.CapabilityProviderSerializable;
 import unassigned.plentifulutilities.utils.ModUtil;
+import unassigned.plentifulutilities.utils.VoidUtil;
 import unassigned.plentifulutilities.voidenergy.base.IVoidStorage;
-import unassigned.plentifulutilities.voidenergy.base.VoidStorage;
 import unassigned.plentifulutilities.voidenergy.base.energy.IVoidHolder;
 import unassigned.plentifulutilities.voidenergy.base.energy.IVoidHolderModifiable;
 
@@ -76,7 +73,7 @@ public class CapabilityVoidEnergy {
             public NBTBase writeNBT(final Capability<IVoidStorage> capability, final IVoidStorage instance, final EnumFacing side) {
                 NBTTagCompound tag = new NBTTagCompound();
                 tag.setInteger("voidStored", instance.getVoidStored());
-                tag.setInteger("maxVoidStored", instance.getMaxVoidStored());
+                tag.setInteger("dangerTicks", instance.getDangerTicks());
                 return tag;
             }
 
@@ -86,7 +83,7 @@ public class CapabilityVoidEnergy {
                     throw new IllegalArgumentException("Given incorrect instance from implementation");
 
                 ((VoidEnergy) instance).setVoidEnergy(((NBTTagCompound)nbt).getInteger("voidStored"));
-                ((VoidEnergy) instance).setMaxVoidEnergy(((NBTTagCompound)nbt).getInteger("maxVoidStored"));
+                ((VoidEnergy) instance).setDangerTicks(((NBTTagCompound)nbt).getInteger("dangerTicks"));
             }
         }, () -> null);
     }
@@ -157,12 +154,10 @@ public class CapabilityVoidEnergy {
         }
 
         private static int globalVoidEvent; //this doesn't need to save to NBT as its actual value is unimportant
-        private static int LOWER_THRESHOLD = (int)(DEFAULT_ENERGY / 2); //The lower threshold where void regen will occur
-        private static int UPPER_THRESHOLD = (int)(DEFAULT_ENERGY * 1.5); //The upper threshold where void will disperse
-        private static int DANGER_HIGH_THRESHOLD = (int)(DEFAULT_ENERGY * 1.8); //The high danger threshold where void will become unstable
-        private static int DANGER_LOW_THRESHOLD = (int)(DEFAULT_ENERGY / 5); //The low danger threshold where void will become unstable
-
-        private static int dangerTick;
+        public static int LOWER_THRESHOLD = (int)(DEFAULT_ENERGY / 2); //The lower threshold where void regen will occur
+        public static int UPPER_THRESHOLD = (int)(DEFAULT_ENERGY * 1.5); //The upper threshold where void will disperse
+        public static int DANGER_HIGH_THRESHOLD = (int)(DEFAULT_ENERGY * 1.8); //The high danger threshold where void will become unstable
+        public static int DANGER_LOW_THRESHOLD = (int)(DEFAULT_ENERGY / 5); //The low danger threshold where void will become unstable
 
         @SubscribeEvent
         public static void onWorldTick(final TickEvent.WorldTickEvent event) {
@@ -170,7 +165,7 @@ public class CapabilityVoidEnergy {
             Random rand = world.rand;
             globalVoidEvent++;
 
-            if(globalVoidEvent % 20 == 0) //every second update
+            if(globalVoidEvent % 20 == 0)
             {
                 for(ChunkPos pos : VoidEnergyHolder.getVoidEnergies().keySet())
                 {
@@ -205,6 +200,7 @@ public class CapabilityVoidEnergy {
                         {
                             //bad stuff happens here. However, should seem opposite of what happens during a HIGH energy event (ex. black hole)
                             //this should create a large amount of void.
+                            ((VoidEnergy)thisStorage).updateDangerTicks();
                         }
                     }
 
@@ -228,27 +224,25 @@ public class CapabilityVoidEnergy {
                             }
                         }
 
-                        if(thisStorage.getVoidStored() > DANGER_HIGH_THRESHOLD) //todo tommorow: make ticks alive within chunk- if doesnt work as each instance is being called.
+                        if(thisStorage.getVoidStored() > DANGER_HIGH_THRESHOLD)
                         {
-                            //bad stuff happens here. However, should be opposite of what happens during a LOW energy event (ex. explosion)
-                            // this should discharge a large amount of void. possibly make this a dangerous way to gather energy
-                            dangerTick++; //ticks every second
+                            ((VoidEnergy)thisStorage).updateDangerTicks();
+                            int dangerTicks = ((VoidEnergy)thisStorage).getDangerTicks();
 
-                            if(dangerTick == 2) { System.out.println("WARNING! HIGH VOID EVENT DETECTED!"); }
-                            System.out.println(dangerTick);
+                            if(dangerTicks == 2) { System.out.println("HIGH VOID EVENT STARTED!"); }
 
-                            if(dangerTick >= 30) //30 seconds
+                            VoidUtil.spawnParticlesRandomWithinChunk(world, pos);
+
+                            if(dangerTicks == 78)
                             {
-                                int x = thisStorage.getChunkPos().x * 16;
-                                int z = thisStorage.getChunkPos().z * 16;
-                                int y = world.getHeight(x, z);
-
-                                world.createExplosion(null, x, y, z, (thisStorage.getVoidStored() / 1000), false);
-                                System.out.println("DISCHARGE EVENT! at: " + x + " y: " + y + "  z: " + z);
-                                thisStorage.extractVoid(thisStorage.getVoidStored()/3, false);
-                                dangerTick=0;
+                                VoidUtil.spawnParticlesInMiddleChunk(world, pos);
                             }
-                        }else { /*dangerTick=0;*/ }
+
+                            if(dangerTicks == 80)
+                            {
+                                VoidUtil.setBlockStateInMiddleChunk(world, pos);
+                            }
+                        }
                     }
                 }
             }
